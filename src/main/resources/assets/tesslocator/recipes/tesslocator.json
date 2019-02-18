@@ -1,0 +1,18 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"group": "tesslocator",
+	"result": {"item": "tesslocator", "count": 4},
+	"pattern": [
+		"EHE",
+		"HDH",
+		"EHE"
+	],
+	"key": {
+		"E": {"item": "minecraft:ender_eye"},
+		"D": [
+			{"type": "forge:ore_dict", "ore": "gemDiamond"},
+			{"type": "forge:ore_dict", "ore": "gemEmerald"}
+		],
+		"H": {"item": "minecraft:hopper"}
+	}
+}

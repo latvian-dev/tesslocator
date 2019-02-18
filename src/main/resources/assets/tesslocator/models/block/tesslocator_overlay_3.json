@@ -1,0 +1,21 @@
+{
+	"parent": "tesslocator:block/tesslocator_overlay",
+	"elements": [
+		{
+			"name": "coloru",
+			"from": [1.8, 2.01, 1.8],
+			"to": [14.2, 2.01, 14.2],
+			"faces": {
+				"up": {"uv": [0, 0, 16, 16], "texture": "#1", "tintindex": 3}
+			}
+		},
+		{
+			"name": "colord",
+			"from": [1, -0.01, 1],
+			"to": [15, -0.01, 15],
+			"faces": {
+				"down": {"uv": [0, 0, 16, 16], "texture": "#1", "cullface": "down", "tintindex": 3}
+			}
+		}
+	]
+}

@@ -1,0 +1,6 @@
+# Blocks
+tile.tesslocator.name=Tesslocator
+
+# Config
+tesslocator=Tesslocator
+tesslocator.general.render_particles=Render Particles

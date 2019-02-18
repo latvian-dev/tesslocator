@@ -1,1 +1,1 @@
-# Tesslocator
+# Tesslocator [![](http://cf.way2muchnoise.eu/tesslocator.svg)](https://minecraft.curseforge.com/projects/tesslocator) [![](http://cf.way2muchnoise.eu/versions/tesslocator.svg)](https://minecraft.curseforge.com/projects/tesslocator)
