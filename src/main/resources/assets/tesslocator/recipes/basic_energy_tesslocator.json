@@ -1,0 +1,15 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"group": "tesslocator",
+	"result": {"item": "basic_energy_tesslocator", "count": 4},
+	"pattern": [
+		"GHG",
+		"HFH",
+		"GHG"
+	],
+	"key": {
+		"G": {"type": "forge:ore_dict", "ore": "nuggetGold"},
+		"H": {"item": "minecraft:hopper"},
+		"F": {"type": "forge:ore_dict", "ore": "blockRedstone"}
+	}
+}

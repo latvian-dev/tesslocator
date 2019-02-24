@@ -1,0 +1,15 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"group": "tesslocator",
+	"result": {"item": "basic_fluid_tesslocator", "count": 4},
+	"pattern": [
+		"GHG",
+		"HFH",
+		"GHG"
+	],
+	"key": {
+		"G": {"type": "forge:ore_dict", "ore": "nuggetGold"},
+		"H": {"item": "minecraft:hopper"},
+		"F": {"item": "minecraft:glass_bottle"}
+	}
+}

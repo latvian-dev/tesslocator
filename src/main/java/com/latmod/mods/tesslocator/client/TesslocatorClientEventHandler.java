@@ -1,8 +1,9 @@
 package com.latmod.mods.tesslocator.client;
 
-import com.latmod.mods.tesslocator.BlockTesslocator;
 import com.latmod.mods.tesslocator.Tesslocator;
-import com.latmod.mods.tesslocator.TileTesslocator;
+import com.latmod.mods.tesslocator.block.BlockTesslocator;
+import com.latmod.mods.tesslocator.block.TileTesslocator;
+import com.latmod.mods.tesslocator.item.TesslocatorItems;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.item.Item;
 import net.minecraft.tileentity.TileEntity;
@@ -17,25 +18,40 @@ import net.minecraftforge.fml.relauncher.Side;
  * @author LatvianModder
  */
 @Mod.EventBusSubscriber(modid = Tesslocator.MOD_ID, value = Side.CLIENT)
-public class ModularPipesClientEventHandler
+public class TesslocatorClientEventHandler
 {
+	private static void registerModel(Item item, String variant)
+	{
+		ModelLoader.setCustomModelResourceLocation(item, 0, new ModelResourceLocation(item.getRegistryName(), variant));
+	}
+
 	@SubscribeEvent
 	public static void registerModels(ModelRegistryEvent event)
 	{
-		ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(BlockTesslocator.INSTANCE), 0, new ModelResourceLocation(BlockTesslocator.INSTANCE.getRegistryName(), "normal"));
+		registerModel(TesslocatorItems.BASIC_ITEM_TESSLOCATOR, "inventory");
+		registerModel(TesslocatorItems.BASIC_FLUID_TESSLOCATOR, "inventory");
+		registerModel(TesslocatorItems.BASIC_ENERGY_TESSLOCATOR, "inventory");
+		registerModel(TesslocatorItems.ADVANCED_ITEM_TESSLOCATOR, "inventory");
+		registerModel(TesslocatorItems.ADVANCED_FLUID_TESSLOCATOR, "inventory");
+		registerModel(TesslocatorItems.ADVANCED_ENERGY_TESSLOCATOR, "inventory");
 	}
 
 	@SubscribeEvent
 	public static void registerBlockColors(ColorHandlerEvent.Block event)
 	{
 		event.getBlockColors().registerBlockColorHandler((state, world, pos, tintIndex) -> {
-			if (world != null && pos != null && tintIndex >= 0 && tintIndex < 6)
+			if (world != null && pos != null && tintIndex >= 0)
 			{
 				TileEntity tileEntity = world.getTileEntity(pos);
 
 				if (tileEntity instanceof TileTesslocator)
 				{
+					TileTesslocator tile = (TileTesslocator) tileEntity;
 
+					if (tile.parts[tintIndex % 6] != null)
+					{
+						return tile.parts[tintIndex % 6].getColor(tintIndex / 6);
+					}
 				}
 			}
 

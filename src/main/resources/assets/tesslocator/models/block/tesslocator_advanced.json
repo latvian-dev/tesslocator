@@ -2,8 +2,8 @@
 	"parent": "block/block",
 	"credit": "Made with Blockbench",
 	"textures": {
-		"0": "tesslocator:blocks/tesslocator",
-		"particle": "tesslocator:blocks/tesslocator"
+		"0": "tesslocator:blocks/tesslocator_advanced",
+		"particle": "tesslocator:blocks/tesslocator_advanced"
 	},
 	"elements": [
 		{

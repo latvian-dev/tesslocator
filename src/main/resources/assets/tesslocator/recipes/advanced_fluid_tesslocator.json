@@ -1,0 +1,15 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"group": "tesslocator",
+	"result": {"item": "advanced_fluid_tesslocator", "count": 4},
+	"pattern": [
+		"OTO",
+		"TET",
+		"OTO"
+	],
+	"key": {
+		"T": {"item": "basic_fluid_tesslocator"},
+		"E": {"item": "minecraft:ender_eye"},
+		"O": {"type": "forge:ore_dict", "ore": "obsidian"}
+	}
+}

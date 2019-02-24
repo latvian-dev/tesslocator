@@ -1,5 +1,22 @@
 {
 	"multipart": [
-		{"apply": {"model": "tesslocator:tesslocator"}}
+		{"when": {"d": "1"}, "apply": {"model": "tesslocator:tesslocator_basic"}},
+		{"when": {"u": "1"}, "apply": {"model": "tesslocator:tesslocator_basic", "x": 180}},
+		{"when": {"n": "1"}, "apply": {"model": "tesslocator:tesslocator_basic", "x": 90, "y": 180}},
+		{"when": {"s": "1"}, "apply": {"model": "tesslocator:tesslocator_basic", "x": 90}},
+		{"when": {"w": "1"}, "apply": {"model": "tesslocator:tesslocator_basic", "x": 90, "y": 90}},
+		{"when": {"e": "1"}, "apply": {"model": "tesslocator:tesslocator_basic", "x": 90, "y": 270}},
+		{"when": {"d": "2"}, "apply": {"model": "tesslocator:tesslocator_advanced"}},
+		{"when": {"u": "2"}, "apply": {"model": "tesslocator:tesslocator_advanced", "x": 180}},
+		{"when": {"n": "2"}, "apply": {"model": "tesslocator:tesslocator_advanced", "x": 90, "y": 180}},
+		{"when": {"s": "2"}, "apply": {"model": "tesslocator:tesslocator_advanced", "x": 90}},
+		{"when": {"w": "2"}, "apply": {"model": "tesslocator:tesslocator_advanced", "x": 90, "y": 90}},
+		{"when": {"e": "2"}, "apply": {"model": "tesslocator:tesslocator_advanced", "x": 90, "y": 270}},
+		{"when": {"d": "1|2"}, "apply": {"model": "tesslocator:tesslocator_overlay_d"}},
+		{"when": {"u": "1|2"}, "apply": {"model": "tesslocator:tesslocator_overlay_u", "x": 180}},
+		{"when": {"n": "1|2"}, "apply": {"model": "tesslocator:tesslocator_overlay_n", "x": 90, "y": 180}},
+		{"when": {"s": "1|2"}, "apply": {"model": "tesslocator:tesslocator_overlay_s", "x": 90}},
+		{"when": {"w": "1|2"}, "apply": {"model": "tesslocator:tesslocator_overlay_w", "x": 90, "y": 90}},
+		{"when": {"e": "1|2"}, "apply": {"model": "tesslocator:tesslocator_overlay_e", "x": 90, "y": 270}}
 	]
 }

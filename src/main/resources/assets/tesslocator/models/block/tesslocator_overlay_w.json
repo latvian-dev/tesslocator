@@ -16,6 +16,22 @@
 			"faces": {
 				"down": {"uv": [0, 0, 16, 16], "texture": "#1", "cullface": "down", "tintindex": 4}
 			}
+		},
+		{
+			"name": "coloru",
+			"from": [1.8, 2.01, 1.8],
+			"to": [14.2, 2.01, 14.2],
+			"faces": {
+				"up": {"uv": [0, 0, 16, 16], "texture": "#2", "tintindex": 10}
+			}
+		},
+		{
+			"name": "colord",
+			"from": [1, -0.01, 1],
+			"to": [15, -0.01, 15],
+			"faces": {
+				"down": {"uv": [0, 0, 16, 16], "texture": "#2", "cullface": "down", "tintindex": 10}
+			}
 		}
 	]
 }
