@@ -10,6 +10,6 @@
 	"key": {
 		"G": {"type": "forge:ore_dict", "ore": "nuggetGold"},
 		"H": {"item": "minecraft:hopper"},
-		"F": {"type": "forge:ore_dict", "ore": "blockRedstone"}
+		"F": {"type": "forge:ore_dict", "ore": "dustRedstone"}
 	}
 }
