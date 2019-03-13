@@ -1,4 +1,5 @@
 # Items
+item.tesslocator.tooltip=Translocator and Tesseract hybrid
 item.tesslocator.basic_item_tesslocator.name=Basic Item Tesslocator
 item.tesslocator.basic_fluid_tesslocator.name=Basic Fluid Tesslocator
 item.tesslocator.basic_energy_tesslocator.name=Basic Energy Tesslocator

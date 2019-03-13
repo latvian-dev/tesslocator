@@ -9,6 +9,7 @@ import com.latmod.mods.tesslocator.block.part.TesslocatorPart;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -99,7 +100,8 @@ public class ItemTesslocator extends Item
 
 	@Override
 	@SideOnly(Side.CLIENT)
-	public void addInformation(ItemStack stack, @Nullable World worldIn, List<String> tooltip, ITooltipFlag flagIn)
+	public void addInformation(ItemStack stack, @Nullable World world, List<String> tooltip, ITooltipFlag flag)
 	{
+		tooltip.add(I18n.format("item.tesslocator.tooltip"));
 	}
 }
