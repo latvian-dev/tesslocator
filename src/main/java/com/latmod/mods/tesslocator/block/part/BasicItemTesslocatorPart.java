@@ -23,6 +23,7 @@ public class BasicItemTesslocatorPart extends BasicTesslocatorPart
 	public ItemStack filter = ItemStack.EMPTY;
 	public int currentSlot = 0;
 	public int cooldown = 0;
+	public int currentPart = 0;
 
 	public BasicItemTesslocatorPart(TileTesslocator t, EnumFacing f)
 	{
@@ -159,29 +160,29 @@ public class BasicItemTesslocatorPart extends BasicTesslocatorPart
 			}
 		}
 
-		for (int i = 0; i < tempParts; i++)
+		int i = tempParts == 1 ? 0 : currentPart % tempParts;
+
+		if (ItemFiltersAPI.filter(temp[i].filter, stack))
 		{
-			if (ItemFiltersAPI.filter(temp[i].filter, stack))
+			TileEntity outEntity = block.getWorld().getTileEntity(block.getPos().offset(temp[i].facing));
+
+			if (outEntity != null)
 			{
-				TileEntity outEntity = block.getWorld().getTileEntity(block.getPos().offset(temp[i].facing));
+				IItemHandler outHandler = outEntity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, temp[i].facing.getOpposite());
 
-				if (outEntity != null)
+				if (outHandler != null)
 				{
-					IItemHandler outHandler = outEntity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, temp[i].facing.getOpposite());
+					ItemStack stack1 = ItemHandlerHelper.insertItem(outHandler, stack, false);
 
-					if (outHandler != null)
+					if (stack1.getCount() != stack.getCount())
 					{
-						ItemStack stack1 = ItemHandlerHelper.insertItem(outHandler, stack, false);
-
-						if (stack1.getCount() != stack.getCount())
-						{
-							handler.extractItem(currentSlot, stack.getCount() - stack1.getCount(), false);
-						}
+						handler.extractItem(currentSlot, stack.getCount() - stack1.getCount(), false);
 					}
 				}
 			}
 		}
 
 		currentSlot++;
+		currentPart++;
 	}
 }

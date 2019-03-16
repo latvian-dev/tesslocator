@@ -1,7 +1,7 @@
 {
 	"type": "minecraft:crafting_shaped",
 	"group": "tesslocator",
-	"result": {"item": "advanced_fluid_tesslocator", "count": 4},
+	"result": {"item": "advanced_fluid_tesslocator", "count": 4, "nbt": "{colors:0b}"},
 	"pattern": [
 		"OTO",
 		"TET",

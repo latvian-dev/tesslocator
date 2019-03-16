@@ -5,6 +5,7 @@ import com.latmod.mods.tesslocator.block.BlockTesslocator;
 import com.latmod.mods.tesslocator.block.TileTesslocator;
 import com.latmod.mods.tesslocator.item.TesslocatorItems;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
+import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.Item;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.client.event.ColorHandlerEvent;
@@ -57,5 +58,33 @@ public class TesslocatorClientEventHandler
 
 			return 0xFFFFFFFF;
 		}, BlockTesslocator.INSTANCE);
+	}
+
+	@SubscribeEvent
+	public static void registerItemColors(ColorHandlerEvent.Item event)
+	{
+		event.getItemColors().registerItemColorHandler((stack, tintIndex) -> {
+			int colors = stack.hasTagCompound() ? stack.getTagCompound().getByte("colors") & 0xFF : 0;
+			return EnumDyeColor.byMetadata((colors >> (tintIndex * 4)) & 0xF).getColorValue();
+		}, TesslocatorItems.ADVANCED_ITEM_TESSLOCATOR, TesslocatorItems.ADVANCED_FLUID_TESSLOCATOR, TesslocatorItems.ADVANCED_ENERGY_TESSLOCATOR);
+
+		event.getBlockColors().registerBlockColorHandler((state, world, pos, tintIndex) -> {
+			if (world != null && pos != null && tintIndex >= 0)
+			{
+				TileEntity tileEntity = world.getTileEntity(pos);
+
+				if (tileEntity instanceof TileTesslocator)
+				{
+					TileTesslocator tile = (TileTesslocator) tileEntity;
+
+					if (tile.parts[tintIndex % 6] != null)
+					{
+						return tile.parts[tintIndex % 6].getColor(tintIndex / 6);
+					}
+				}
+			}
+
+			return 0xFFFFFFFF;
+		});
 	}
 }

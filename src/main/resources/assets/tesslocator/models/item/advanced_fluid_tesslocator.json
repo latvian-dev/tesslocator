@@ -1,3 +1,6 @@
 {
-	"parent": "tesslocator:block/tesslocator_advanced"
+	"parent": "tesslocator:block/tesslocator_advanced_item",
+	"textures": {
+		"0": "tesslocator:blocks/tesslocator_advanced_fluid"
+	}
 }

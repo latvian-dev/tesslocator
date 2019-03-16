@@ -4,6 +4,7 @@ import com.latmod.mods.tesslocator.block.TileTesslocator;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
 
 /**
  * @author LatvianModder
@@ -42,7 +43,7 @@ public abstract class BasicTesslocatorPart extends TesslocatorPart
 	}
 
 	@Override
-	public void onRightClick(EntityPlayer player)
+	public void onRightClick(EntityPlayer player, EnumHand hand)
 	{
 		if (!player.world.isRemote)
 		{

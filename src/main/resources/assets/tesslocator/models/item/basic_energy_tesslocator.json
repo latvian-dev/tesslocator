@@ -1,3 +1,6 @@
 {
-	"parent": "tesslocator:block/tesslocator_basic"
+	"parent": "tesslocator:block/tesslocator_basic_item",
+	"textures": {
+		"0": "tesslocator:blocks/tesslocator_basic_energy"
+	}
 }

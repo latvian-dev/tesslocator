@@ -2,8 +2,10 @@ package com.latmod.mods.tesslocator.block.part;
 
 import com.latmod.mods.tesslocator.block.TileTesslocator;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
 import net.minecraft.util.ITickable;
 import net.minecraftforge.common.capabilities.Capability;
 
@@ -43,7 +45,11 @@ public abstract class TesslocatorPart implements ITickable
 		return 0xFFFFFFFF;
 	}
 
-	public void onRightClick(EntityPlayer player)
+	public void onRightClick(EntityPlayer player, EnumHand hand)
+	{
+	}
+
+	public void onPlaced(EntityPlayer player, ItemStack stack)
 	{
 	}
 }

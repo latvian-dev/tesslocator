@@ -14,6 +14,7 @@ import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagByte;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumFacing;
@@ -268,7 +269,7 @@ public class BlockTesslocator extends Block
 
 		if (side != null && ((TileTesslocator) tileEntity).parts[side.getIndex()] != null)
 		{
-			((TileTesslocator) tileEntity).parts[side.getIndex()].onRightClick(player);
+			((TileTesslocator) tileEntity).parts[side.getIndex()].onRightClick(player, hand);
 			return true;
 		}
 
@@ -296,7 +297,14 @@ public class BlockTesslocator extends Block
 
 				if (tile.parts[side.getIndex()] != null)
 				{
-					return new ItemStack(tile.parts[side.getIndex()].getType().item.get());
+					ItemStack stack = new ItemStack(tile.parts[side.getIndex()].getType().item.get());
+
+					if (tile.parts[side.getIndex()].getType().isAdvanced)
+					{
+						stack.setTagInfo("colors", new NBTTagByte((byte) ((AdvancedTesslocatorPart) tile.parts[side.getIndex()]).colors));
+					}
+
+					return stack;
 				}
 			}
 		}

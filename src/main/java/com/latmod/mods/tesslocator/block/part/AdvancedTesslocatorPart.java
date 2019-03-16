@@ -3,6 +3,7 @@ package com.latmod.mods.tesslocator.block.part;
 import com.latmod.mods.tesslocator.block.TileTesslocator;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.EnumDyeColor;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
 
@@ -42,7 +43,7 @@ public abstract class AdvancedTesslocatorPart extends TesslocatorPart
 		super.readData(nbt);
 		owner = nbt.getUniqueId("owner");
 		isPublic = nbt.getBoolean("public");
-		colors = nbt.getInteger("colors") & 0xFF;
+		colors = nbt.getByte("colors") & 0xFF;
 	}
 
 	@Override
@@ -52,7 +53,8 @@ public abstract class AdvancedTesslocatorPart extends TesslocatorPart
 	}
 
 	@Override
-	public void onRightClick(EntityPlayer player)
+	public void onPlaced(EntityPlayer player, ItemStack stack)
 	{
+		colors = stack.hasTagCompound() ? stack.getTagCompound().getByte("colors") & 0xFF : 0;
 	}
 }

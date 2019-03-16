@@ -4,10 +4,12 @@ import com.latmod.mods.tesslocator.block.BlockTesslocator;
 import com.latmod.mods.tesslocator.block.TessNet;
 import com.latmod.mods.tesslocator.block.TileTesslocator;
 import com.latmod.mods.tesslocator.block.part.EnumPartType;
+import com.latmod.mods.tesslocator.item.AdvancedTesslocatorColorRecipe;
 import com.latmod.mods.tesslocator.item.ItemTesslocator;
 import net.minecraft.block.Block;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
+import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -47,6 +49,12 @@ public class TesslocatorEventHandler
 				withName(new ItemTesslocator(EnumPartType.ADVANCED_FLUID), "advanced_fluid_tesslocator"),
 				withName(new ItemTesslocator(EnumPartType.ADVANCED_ENERGY), "advanced_energy_tesslocator")
 		);
+	}
+
+	@SubscribeEvent
+	public static void registerRecipes(RegistryEvent.Register<IRecipe> event)
+	{
+		event.getRegistry().register(new AdvancedTesslocatorColorRecipe().setRegistryName("advanced_tesslocator_color"));
 	}
 
 	@SubscribeEvent

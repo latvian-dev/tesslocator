@@ -13,6 +13,7 @@ import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
@@ -77,6 +78,7 @@ public class ItemTesslocator extends Item
 				}
 
 				tile.parts[opposite.getIndex()] = part;
+				part.onPlaced(player, stack);
 				tileEntity.markDirty();
 				TessNet.INSTANCE.refresh();
 			}
@@ -91,7 +93,12 @@ public class ItemTesslocator extends Item
 
 			SoundType soundtype = state.getBlock().getSoundType(state, world, pos, player);
 			world.playSound(player, pos, soundtype.getPlaceSound(), SoundCategory.BLOCKS, (soundtype.getVolume() + 1.0F) / 2.0F, soundtype.getPitch() * 0.8F);
-			stack.shrink(1);
+
+			if (!player.capabilities.isCreativeMode)
+			{
+				stack.shrink(1);
+			}
+
 			return EnumActionResult.SUCCESS;
 		}
 
@@ -103,5 +110,12 @@ public class ItemTesslocator extends Item
 	public void addInformation(ItemStack stack, @Nullable World world, List<String> tooltip, ITooltipFlag flag)
 	{
 		tooltip.add(I18n.format("item.tesslocator.tooltip"));
+
+		if (type.isAdvanced)
+		{
+			int col = stack.hasTagCompound() ? (stack.getTagCompound().getByte("colors") & 0xFF) : 0;
+			tooltip.add("Color 1: " + I18n.format("item.fireworksCharge." + EnumDyeColor.byMetadata(col & 0xF).getTranslationKey()));
+			tooltip.add("Color 2: " + I18n.format("item.fireworksCharge." + EnumDyeColor.byMetadata((col >> 4) & 0xF).getTranslationKey()));
+		}
 	}
 }
