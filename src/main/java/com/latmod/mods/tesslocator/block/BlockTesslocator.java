@@ -336,7 +336,7 @@ public class BlockTesslocator extends Block
 			{
 				if (!player.capabilities.isCreativeMode)
 				{
-					spawnAsEntity(world, pos, new ItemStack(tile.parts[side.getIndex()].getType().item.get()));
+					tile.parts[side.getIndex()].drop(world, pos);
 				}
 
 				tile.parts[side.getIndex()] = null;

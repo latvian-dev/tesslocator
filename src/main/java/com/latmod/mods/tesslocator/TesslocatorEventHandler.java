@@ -16,6 +16,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.common.registry.GameRegistry;
+import net.minecraftforge.registries.IForgeRegistry;
 
 /**
  * @author LatvianModder
@@ -41,14 +42,13 @@ public class TesslocatorEventHandler
 	@SubscribeEvent
 	public static void registerItems(RegistryEvent.Register<Item> event)
 	{
-		event.getRegistry().registerAll(
-				withName(new ItemTesslocator(EnumPartType.BASIC_ITEM), "basic_item_tesslocator"),
-				withName(new ItemTesslocator(EnumPartType.BASIC_FLUID), "basic_fluid_tesslocator"),
-				withName(new ItemTesslocator(EnumPartType.BASIC_ENERGY), "basic_energy_tesslocator"),
-				withName(new ItemTesslocator(EnumPartType.ADVANCED_ITEM), "advanced_item_tesslocator"),
-				withName(new ItemTesslocator(EnumPartType.ADVANCED_FLUID), "advanced_fluid_tesslocator"),
-				withName(new ItemTesslocator(EnumPartType.ADVANCED_ENERGY), "advanced_energy_tesslocator")
-		);
+		IForgeRegistry<Item> r = event.getRegistry();
+		r.register(withName(new ItemTesslocator(EnumPartType.BASIC_ITEM), "basic_item_tesslocator"));
+		//r.register(withName(new ItemTesslocator(EnumPartType.BASIC_FLUID), "basic_fluid_tesslocator"));
+		//r.register(withName(new ItemTesslocator(EnumPartType.BASIC_ENERGY), "basic_energy_tesslocator"));
+		//r.register(withName(new ItemTesslocator(EnumPartType.ADVANCED_ITEM), "advanced_item_tesslocator"));
+		//r.register(withName(new ItemTesslocator(EnumPartType.ADVANCED_FLUID), "advanced_fluid_tesslocator"));
+		//r.register(withName(new ItemTesslocator(EnumPartType.ADVANCED_ENERGY), "advanced_energy_tesslocator"));
 	}
 
 	@SubscribeEvent
