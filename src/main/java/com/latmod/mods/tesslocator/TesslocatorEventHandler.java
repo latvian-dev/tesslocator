@@ -44,11 +44,11 @@ public class TesslocatorEventHandler
 	{
 		IForgeRegistry<Item> r = event.getRegistry();
 		r.register(withName(new ItemTesslocator(EnumPartType.BASIC_ITEM), "basic_item_tesslocator"));
-		//r.register(withName(new ItemTesslocator(EnumPartType.BASIC_FLUID), "basic_fluid_tesslocator"));
-		//r.register(withName(new ItemTesslocator(EnumPartType.BASIC_ENERGY), "basic_energy_tesslocator"));
-		//r.register(withName(new ItemTesslocator(EnumPartType.ADVANCED_ITEM), "advanced_item_tesslocator"));
-		//r.register(withName(new ItemTesslocator(EnumPartType.ADVANCED_FLUID), "advanced_fluid_tesslocator"));
-		//r.register(withName(new ItemTesslocator(EnumPartType.ADVANCED_ENERGY), "advanced_energy_tesslocator"));
+		r.register(withName(new ItemTesslocator(EnumPartType.BASIC_FLUID).setDisabled(), "basic_fluid_tesslocator"));
+		r.register(withName(new ItemTesslocator(EnumPartType.BASIC_ENERGY).setDisabled(), "basic_energy_tesslocator"));
+		r.register(withName(new ItemTesslocator(EnumPartType.ADVANCED_ITEM).setDisabled(), "advanced_item_tesslocator"));
+		r.register(withName(new ItemTesslocator(EnumPartType.ADVANCED_FLUID).setDisabled(), "advanced_fluid_tesslocator"));
+		r.register(withName(new ItemTesslocator(EnumPartType.ADVANCED_ENERGY).setDisabled(), "advanced_energy_tesslocator"));
 	}
 
 	@SubscribeEvent

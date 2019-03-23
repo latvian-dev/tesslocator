@@ -22,6 +22,7 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -35,15 +36,28 @@ import java.util.List;
 public class ItemTesslocator extends Item
 {
 	public final EnumPartType type;
+	public boolean disabled;
 
 	public ItemTesslocator(EnumPartType t)
 	{
 		type = t;
+		disabled = false;
+	}
+
+	public ItemTesslocator setDisabled()
+	{
+		disabled = true;
+		return this;
 	}
 
 	@Override
 	public EnumActionResult onItemUse(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ)
 	{
+		if (disabled)
+		{
+			return EnumActionResult.SUCCESS;
+		}
+
 		if (!world.getBlockState(pos).getBlock().isReplaceable(world, pos))
 		{
 			pos = pos.offset(facing);
@@ -109,6 +123,11 @@ public class ItemTesslocator extends Item
 	@SideOnly(Side.CLIENT)
 	public void addInformation(ItemStack stack, @Nullable World world, List<String> tooltip, ITooltipFlag flag)
 	{
+		if (disabled)
+		{
+			tooltip.add(TextFormatting.RED + "Currently disabled, because it's not finished!");
+		}
+
 		tooltip.add(I18n.format("item.tesslocator.tooltip"));
 
 		if (type.isAdvanced)
