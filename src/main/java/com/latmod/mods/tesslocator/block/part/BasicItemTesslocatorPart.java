@@ -116,7 +116,7 @@ public class BasicItemTesslocatorPart extends BasicTesslocatorPart
 			return;
 		}
 
-		cooldown = 17 - boost;
+		cooldown = 64 - boost * 4;
 
 		int tempParts = 0;
 
@@ -159,29 +159,31 @@ public class BasicItemTesslocatorPart extends BasicTesslocatorPart
 		{
 			return;
 		}
-		else if (currentSlot >= slots)
+
+		int originalSlot = currentSlot % slots;
+
+		if (originalSlot < 0)
 		{
-			currentSlot = 0;
+			originalSlot = 0;
 		}
 
-		int originalSlot = currentSlot;
 		ItemStack stack;
 
 		while (true)
 		{
-			stack = handler.extractItem(currentSlot, 64, true);
+			if (currentSlot < 0)
+			{
+				currentSlot = 0;
+			}
+
+			stack = handler.extractItem(currentSlot % slots, 64, true);
 
 			if (!stack.isEmpty() && ItemFiltersAPI.filter(filter, stack))
 			{
 				break;
 			}
 
-			currentSlot++;
-
-			if (currentSlot >= slots)
-			{
-				currentSlot = 0;
-			}
+			currentSlot = (currentSlot + 1) % slots;
 
 			if (currentSlot == originalSlot)
 			{
@@ -189,7 +191,7 @@ public class BasicItemTesslocatorPart extends BasicTesslocatorPart
 			}
 		}
 
-		int i = tempParts == 1 ? 0 : currentPart % tempParts;
+		int i = currentPart % tempParts;
 
 		if (ItemFiltersAPI.filter(temp[i].filter, stack))
 		{
