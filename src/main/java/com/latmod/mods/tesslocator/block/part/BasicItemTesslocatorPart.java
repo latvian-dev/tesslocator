@@ -248,7 +248,10 @@ public class BasicItemTesslocatorPart extends BasicTesslocatorPart
 						boost = 16;
 					}
 
-					stack1.shrink(1);
+					if (!player.capabilities.isCreativeMode)
+					{
+						stack1.shrink(1);
+					}
 				}
 
 				player.sendStatusMessage(new TextComponentString(boost + " / 16"), true);
