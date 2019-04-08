@@ -83,7 +83,7 @@ public class BasicItemTesslocatorPart extends BasicTesslocatorPart implements II
 
 		if (currentPart > 0)
 		{
-			nbt.setByte("current_slot", (byte) currentPart);
+			nbt.setByte("current_part", (byte) currentPart);
 		}
 
 		NBTTagList list = new NBTTagList();
@@ -111,6 +111,12 @@ public class BasicItemTesslocatorPart extends BasicTesslocatorPart implements II
 		filter = nbt.hasKey("filter") ? new ItemStack(nbt.getCompoundTag("filter")) : ItemStack.EMPTY;
 		boost = nbt.getByte("boost") & 0xFF;
 		currentSlot = nbt.getInteger("current_slot");
+
+		if (currentSlot < 0)
+		{
+			currentSlot = 0;
+		}
+
 		cooldown = nbt.getByte("cooldown") & 0xFF;
 		currentPart = nbt.getByte("current_part") & 0xFF;
 
