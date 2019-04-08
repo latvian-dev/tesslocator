@@ -1,6 +1,7 @@
 package com.latmod.mods.tesslocator.block.part;
 
 import com.latmod.mods.itemfilters.api.ItemFiltersAPI;
+import com.latmod.mods.tesslocator.TesslocatorConfig;
 import com.latmod.mods.tesslocator.block.TileTesslocator;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import net.minecraft.block.Block;
@@ -8,29 +9,36 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemHandlerHelper;
 import net.minecraftforge.oredict.OreDictionary;
 
 import javax.annotation.Nullable;
+import java.util.Arrays;
 
 /**
  * @author LatvianModder
  */
-public class BasicItemTesslocatorPart extends BasicTesslocatorPart
+public class BasicItemTesslocatorPart extends BasicTesslocatorPart implements IItemHandlerModifiable
 {
 	private final BasicItemTesslocatorPart[] temp = new BasicItemTesslocatorPart[5];
 
 	public ItemStack filter = ItemStack.EMPTY;
 	public int boost = 0;
+	public final ItemStack[] buffer = new ItemStack[8];
 
 	public int currentSlot = 0;
 	public int cooldown = 0;
@@ -39,6 +47,7 @@ public class BasicItemTesslocatorPart extends BasicTesslocatorPart
 	public BasicItemTesslocatorPart(TileTesslocator t, EnumFacing f)
 	{
 		super(t, f);
+		Arrays.fill(buffer, ItemStack.EMPTY);
 	}
 
 	@Override
@@ -76,6 +85,23 @@ public class BasicItemTesslocatorPart extends BasicTesslocatorPart
 		{
 			nbt.setByte("current_slot", (byte) currentPart);
 		}
+
+		NBTTagList list = new NBTTagList();
+
+		for (int i = 0; i < buffer.length; i++)
+		{
+			if (!buffer[i].isEmpty())
+			{
+				NBTTagCompound nbt1 = buffer[i].serializeNBT();
+				nbt1.setByte("slot", (byte) i);
+				list.appendTag(nbt1);
+			}
+		}
+
+		if (!list.isEmpty())
+		{
+			nbt.setTag("buffer", list);
+		}
 	}
 
 	@Override
@@ -87,19 +113,34 @@ public class BasicItemTesslocatorPart extends BasicTesslocatorPart
 		currentSlot = nbt.getInteger("current_slot");
 		cooldown = nbt.getByte("cooldown") & 0xFF;
 		currentPart = nbt.getByte("current_part") & 0xFF;
+
+		Arrays.fill(buffer, ItemStack.EMPTY);
+
+		NBTTagList list = nbt.getTagList("buffer", Constants.NBT.TAG_COMPOUND);
+
+		for (int i = 0; i < list.tagCount(); i++)
+		{
+			NBTTagCompound nbt1 = list.getCompoundTagAt(i);
+			ItemStack stack = new ItemStack(nbt1);
+
+			if (!stack.isEmpty())
+			{
+				buffer[nbt1.getByte("slot")] = stack;
+			}
+		}
 	}
 
 	@Override
 	public boolean hasCapability(Capability<?> capability)
 	{
-		return false;
+		return capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY;
 	}
 
 	@Nullable
 	@Override
 	public <T> T getCapability(Capability<T> capability)
 	{
-		return null;
+		return capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY ? (T) this : null;
 	}
 
 	@Override
@@ -116,7 +157,7 @@ public class BasicItemTesslocatorPart extends BasicTesslocatorPart
 			return;
 		}
 
-		cooldown = 64 - boost * 4;
+		cooldown = TesslocatorConfig.general.boost_starting - boost * TesslocatorConfig.general.boost_multiplier;
 
 		int tempParts = 0;
 
@@ -160,7 +201,8 @@ public class BasicItemTesslocatorPart extends BasicTesslocatorPart
 			return;
 		}
 
-		int originalSlot = currentSlot % slots;
+		currentSlot = currentSlot % slots;
+		int originalSlot = currentSlot;
 
 		if (originalSlot < 0)
 		{
@@ -171,12 +213,7 @@ public class BasicItemTesslocatorPart extends BasicTesslocatorPart
 
 		while (true)
 		{
-			if (currentSlot < 0)
-			{
-				currentSlot = 0;
-			}
-
-			stack = handler.extractItem(currentSlot % slots, 64, true);
+			stack = handler.extractItem(currentSlot, 64, true);
 
 			if (!stack.isEmpty() && ItemFiltersAPI.filter(filter, stack))
 			{
@@ -239,13 +276,13 @@ public class BasicItemTesslocatorPart extends BasicTesslocatorPart
 
 			if (add > 0)
 			{
-				if (boost < 16)
+				if (boost < TesslocatorConfig.general.boost_max)
 				{
 					boost += add;
 
-					if (boost > 16)
+					if (boost > TesslocatorConfig.general.boost_max)
 					{
-						boost = 16;
+						boost = TesslocatorConfig.general.boost_max;
 					}
 
 					if (!player.capabilities.isCreativeMode)
@@ -254,7 +291,9 @@ public class BasicItemTesslocatorPart extends BasicTesslocatorPart
 					}
 				}
 
-				player.sendStatusMessage(new TextComponentString(boost + " / 16"), true);
+				ITextComponent component = new TextComponentString(boost + " / " + TesslocatorConfig.general.boost_max);
+				component.getStyle().setColor(TextFormatting.GOLD);
+				player.sendStatusMessage(component, true);
 				return;
 			}
 		}
@@ -275,5 +314,117 @@ public class BasicItemTesslocatorPart extends BasicTesslocatorPart
 		{
 			Block.spawnAsEntity(world, pos, new ItemStack(Items.GLOWSTONE_DUST, boost));
 		}
+	}
+
+	@Override
+	public int getSlots()
+	{
+		return buffer.length;
+	}
+
+	@Override
+	public ItemStack getStackInSlot(int slot)
+	{
+		return buffer[slot];
+	}
+
+	@Override
+	public ItemStack insertItem(int slot, ItemStack stack, boolean simulate)
+	{
+		if (stack.isEmpty())
+		{
+			return ItemStack.EMPTY;
+		}
+
+		ItemStack existing = buffer[slot];
+
+		int limit = getStackLimit(slot, stack);
+
+		if (!existing.isEmpty())
+		{
+			if (!ItemHandlerHelper.canItemStacksStack(stack, existing))
+			{
+				return stack;
+			}
+
+			limit -= existing.getCount();
+		}
+
+		if (limit <= 0)
+		{
+			return stack;
+		}
+
+		boolean reachedLimit = stack.getCount() > limit;
+
+		if (!simulate)
+		{
+			if (existing.isEmpty())
+			{
+				buffer[slot] = reachedLimit ? ItemHandlerHelper.copyStackWithSize(stack, limit) : stack;
+			}
+			else
+			{
+				existing.grow(reachedLimit ? limit : stack.getCount());
+			}
+
+			block.markDirty();
+		}
+
+		return reachedLimit ? ItemHandlerHelper.copyStackWithSize(stack, stack.getCount() - limit) : ItemStack.EMPTY;
+	}
+
+	@Override
+	public ItemStack extractItem(int slot, int amount, boolean simulate)
+	{
+		if (amount == 0)
+		{
+			return ItemStack.EMPTY;
+		}
+
+		ItemStack existing = buffer[slot];
+
+		if (existing.isEmpty())
+		{
+			return ItemStack.EMPTY;
+		}
+
+		int toExtract = Math.min(amount, existing.getMaxStackSize());
+
+		if (existing.getCount() <= toExtract)
+		{
+			if (!simulate)
+			{
+				buffer[slot] = ItemStack.EMPTY;
+				block.markDirty();
+			}
+
+			return existing;
+		}
+
+		if (!simulate)
+		{
+			buffer[slot] = ItemHandlerHelper.copyStackWithSize(existing, existing.getCount() - toExtract);
+			block.markDirty();
+		}
+
+		return ItemHandlerHelper.copyStackWithSize(existing, toExtract);
+	}
+
+	protected int getStackLimit(int slot, ItemStack stack)
+	{
+		return Math.min(getSlotLimit(slot), stack.getMaxStackSize());
+	}
+
+	@Override
+	public int getSlotLimit(int slot)
+	{
+		return 64;
+	}
+
+	@Override
+	public void setStackInSlot(int slot, ItemStack stack)
+	{
+		buffer[slot] = stack;
 	}
 }

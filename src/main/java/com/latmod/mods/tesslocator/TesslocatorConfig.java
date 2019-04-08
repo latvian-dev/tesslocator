@@ -19,7 +19,11 @@ public class TesslocatorConfig
 	public static class General
 	{
 		@Config.Comment("Spawns particles when items are transferred.")
-		public boolean particles = false;
+		public int boost_max = 16;
+
+		public int boost_multiplier = 4;
+
+		public int boost_starting = 64;
 	}
 
 	public static void sync()
