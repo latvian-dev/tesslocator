@@ -68,8 +68,8 @@ public class BlockTesslocator extends Block
 
 	public BlockTesslocator()
 	{
-		super(Material.IRON, MapColor.CYAN);
-		setHardness(1F);
+		super(Material.CIRCUITS, MapColor.CYAN);
+		setHardness(0.6F);
 		setDefaultState(blockState.getBaseState()
 				.withProperty(CON_D, 0)
 				.withProperty(CON_U, 0)
@@ -310,6 +310,12 @@ public class BlockTesslocator extends Block
 		}
 
 		return ItemStack.EMPTY;
+	}
+
+	@Override
+	public boolean isToolEffective(String type, IBlockState state)
+	{
+		return type.equals("pickaxe") || super.isToolEffective(type, state);
 	}
 
 	@Override
