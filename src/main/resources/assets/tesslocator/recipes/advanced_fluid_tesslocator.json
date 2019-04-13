@@ -1,15 +1,17 @@
 {
 	"type": "minecraft:crafting_shaped",
 	"group": "tesslocator",
-	"result": {"item": "advanced_fluid_tesslocator", "count": 4, "nbt": "{colors:0b}"},
+	"result": {"item": "advanced_fluid_tesslocator", "nbt": "{colors:0b}"},
 	"pattern": [
-		"OTO",
-		"TET",
-		"OTO"
+		"ORO",
+		"ETE",
+		"OGO"
 	],
 	"key": {
 		"T": {"item": "basic_fluid_tesslocator"},
-		"E": {"item": "minecraft:ender_eye"},
-		"O": {"type": "forge:ore_dict", "ore": "obsidian"}
+		"R": {"item": "minecraft:end_rod"},
+		"E": {"type": "forge:ore_dict", "ore": "gemEmerald"},
+		"G": {"item": "minecraft:ghast_tear"},
+		"O": {"type": "forge:ore_dict", "ore": "chestEnder"}
 	}
 }
