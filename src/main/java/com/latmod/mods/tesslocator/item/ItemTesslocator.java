@@ -3,7 +3,6 @@ package com.latmod.mods.tesslocator.item;
 import com.latmod.mods.tesslocator.block.BlockTesslocator;
 import com.latmod.mods.tesslocator.block.TessNet;
 import com.latmod.mods.tesslocator.block.TileTesslocator;
-import com.latmod.mods.tesslocator.block.part.AdvancedTesslocatorPart;
 import com.latmod.mods.tesslocator.block.part.EnumPartType;
 import com.latmod.mods.tesslocator.block.part.TesslocatorPart;
 import net.minecraft.advancements.CriteriaTriggers;
@@ -85,12 +84,6 @@ public class ItemTesslocator extends Item
 				}
 
 				TesslocatorPart part = type.provider.createPart(tile, opposite);
-
-				if (part instanceof AdvancedTesslocatorPart)
-				{
-					((AdvancedTesslocatorPart) part).owner = player.getUniqueID();
-				}
-
 				tile.parts[opposite.getIndex()] = part;
 				part.onPlaced(player, stack);
 				tileEntity.markDirty();

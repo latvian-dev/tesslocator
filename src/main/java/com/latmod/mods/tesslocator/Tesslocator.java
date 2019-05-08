@@ -1,8 +1,10 @@
 package com.latmod.mods.tesslocator;
 
+import com.latmod.mods.tesslocator.client.TesslocatorGuiHandler;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.network.NetworkRegistry;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -27,5 +29,6 @@ public class Tesslocator
 	public void onPreInit(FMLPreInitializationEvent event)
 	{
 		TesslocatorConfig.sync();
+		NetworkRegistry.INSTANCE.registerGuiHandler(this, new TesslocatorGuiHandler());
 	}
 }

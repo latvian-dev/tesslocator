@@ -1,8 +1,10 @@
 package com.latmod.mods.tesslocator.block.part;
 
+import com.latmod.mods.tesslocator.Tesslocator;
 import com.latmod.mods.tesslocator.block.TileTesslocator;
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.inventory.Container;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
@@ -59,5 +61,22 @@ public abstract class TesslocatorPart implements ITickable
 	public void drop(World world, BlockPos pos)
 	{
 		Block.spawnAsEntity(world, pos, new ItemStack(getType().item.get()));
+	}
+
+	public final void openGui(EntityPlayer player)
+	{
+		player.openGui(Tesslocator.INSTANCE, facing.getIndex(), block.getWorld(), block.getPos().getX(), block.getPos().getY(), block.getPos().getZ());
+	}
+
+	@Nullable
+	public Container getGuiContainer(EntityPlayer player)
+	{
+		return null;
+	}
+
+	@Nullable
+	public Object getGuiScreen(Container container)
+	{
+		return null;
 	}
 }

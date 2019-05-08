@@ -55,6 +55,7 @@ public abstract class AdvancedTesslocatorPart extends TesslocatorPart
 	@Override
 	public void onPlaced(EntityPlayer player, ItemStack stack)
 	{
+		owner = player.getUniqueID();
 		colors = stack.hasTagCompound() ? stack.getTagCompound().getByte("colors") & 0xFF : 0;
 	}
 }

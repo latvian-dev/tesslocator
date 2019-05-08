@@ -9,4 +9,8 @@ item.tesslocator.advanced_energy_tesslocator.name=Advanced Energy Tesslocator
 
 # Config
 tesslocator=Tesslocator
-tesslocator.general.render_particles=Render Particles
+tesslocator.general.particles=Particles
+tesslocator.basic_item.speed_boost_max=Speed Boost Max
+tesslocator.basic_item.speed_boost_multiplier=Speed Boost Multiplier
+tesslocator.basic_item.speed_boost_starting=Speed Boost Starting
+tesslocator.basic_item.stack_boost_max=Stack Boost Max

@@ -3,20 +3,18 @@ package com.latmod.mods.tesslocator.block.part;
 import com.latmod.mods.itemfilters.api.ItemFiltersAPI;
 import com.latmod.mods.tesslocator.TesslocatorConfig;
 import com.latmod.mods.tesslocator.block.TileTesslocator;
-import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
+import com.latmod.mods.tesslocator.gui.ContainerBasicItemTesslocator;
+import com.latmod.mods.tesslocator.gui.GuiBasicItemTesslocator;
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
+import net.minecraft.inventory.Container;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextComponentString;
-import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.Constants;
@@ -24,7 +22,7 @@ import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemHandlerHelper;
-import net.minecraftforge.oredict.OreDictionary;
+import net.minecraftforge.items.ItemStackHandler;
 
 import javax.annotation.Nullable;
 import java.util.Arrays;
@@ -36,9 +34,48 @@ public class BasicItemTesslocatorPart extends BasicTesslocatorPart implements II
 {
 	private final BasicItemTesslocatorPart[] temp = new BasicItemTesslocatorPart[5];
 
-	public ItemStack filter = ItemStack.EMPTY;
-	public int boost = 0;
+	public ItemStack inputFilter = ItemStack.EMPTY;
+	public ItemStack outputFilter = ItemStack.EMPTY;
 	public final ItemStack[] buffer = new ItemStack[8];
+
+	public final ItemStackHandler other = new ItemStackHandler(2)
+	{
+		@Override
+		public ItemStack insertItem(int slot, ItemStack stack, boolean simulate)
+		{
+			return isItemValid(slot, stack) ? super.insertItem(slot, stack, simulate) : stack;
+		}
+
+		@Override
+		public boolean isItemValid(int slot, ItemStack stack)
+		{
+			if (slot == 0)
+			{
+				return stack.getItem() == Items.GLOWSTONE_DUST;
+			}
+			else if (slot == 1)
+			{
+				return stack.getItem() == Items.DIAMOND;
+			}
+
+			return false;
+		}
+
+		@Override
+		public int getStackLimit(int slot, ItemStack stack)
+		{
+			if (slot == 0)
+			{
+				return TesslocatorConfig.basic_item.speed_boost_max;
+			}
+			else if (slot == 1)
+			{
+				return TesslocatorConfig.basic_item.stack_boost_max;
+			}
+
+			return 0;
+		}
+	};
 
 	public int currentSlot = 0;
 	public int cooldown = 0;
@@ -61,14 +98,23 @@ public class BasicItemTesslocatorPart extends BasicTesslocatorPart implements II
 	{
 		super.writeData(nbt);
 
-		if (!filter.isEmpty())
+		if (!inputFilter.isEmpty())
 		{
-			nbt.setTag("filter", filter.serializeNBT());
+			nbt.setTag("input_filter", inputFilter.serializeNBT());
 		}
 
-		if (boost > 0)
+		if (!outputFilter.isEmpty())
 		{
-			nbt.setByte("boost", (byte) boost);
+			nbt.setTag("output_filter", outputFilter.serializeNBT());
+		}
+
+		for (int i = 0; i < other.getSlots(); i++)
+		{
+			if (!other.getStackInSlot(i).isEmpty())
+			{
+				nbt.setTag("other", other.serializeNBT());
+				break;
+			}
 		}
 
 		if (currentSlot > 0)
@@ -108,8 +154,31 @@ public class BasicItemTesslocatorPart extends BasicTesslocatorPart implements II
 	public void readData(NBTTagCompound nbt)
 	{
 		super.readData(nbt);
-		filter = nbt.hasKey("filter") ? new ItemStack(nbt.getCompoundTag("filter")) : ItemStack.EMPTY;
-		boost = nbt.getByte("boost") & 0xFF;
+		inputFilter = nbt.hasKey("input_filter") ? new ItemStack(nbt.getCompoundTag("input_filter")) : ItemStack.EMPTY;
+		outputFilter = nbt.hasKey("output_filter") ? new ItemStack(nbt.getCompoundTag("output_filter")) : ItemStack.EMPTY;
+
+		int speedBoost = nbt.getByte("boost") & 0xFF;
+		int stackBoost = nbt.getByte("stack") & 0xFF;
+
+		if (speedBoost > 0 || stackBoost > 0)
+		{
+			other.setSize(2);
+
+			if (speedBoost > 0)
+			{
+				other.setStackInSlot(0, new ItemStack(Items.GLOWSTONE_DUST, speedBoost));
+			}
+
+			if (stackBoost > 0)
+			{
+				other.setStackInSlot(1, new ItemStack(Items.DIAMOND, stackBoost));
+			}
+		}
+		else if (nbt.hasKey("other"))
+		{
+			other.deserializeNBT(nbt.getCompoundTag("other"));
+		}
+
 		currentSlot = nbt.getInteger("current_slot");
 
 		if (currentSlot < 0)
@@ -152,7 +221,7 @@ public class BasicItemTesslocatorPart extends BasicTesslocatorPart implements II
 	@Override
 	public void update()
 	{
-		if (!outputMode)
+		if (mode == 0)
 		{
 			return;
 		}
@@ -163,7 +232,7 @@ public class BasicItemTesslocatorPart extends BasicTesslocatorPart implements II
 			return;
 		}
 
-		cooldown = TesslocatorConfig.general.boost_starting - boost * TesslocatorConfig.general.boost_multiplier;
+		cooldown = TesslocatorConfig.basic_item.speed_boost_starting - (int) (other.getStackInSlot(0).getCount() * TesslocatorConfig.basic_item.speed_boost_multiplier);
 
 		int tempParts = 0;
 
@@ -173,7 +242,7 @@ public class BasicItemTesslocatorPart extends BasicTesslocatorPart implements II
 			{
 				BasicItemTesslocatorPart part1 = (BasicItemTesslocatorPart) part;
 
-				if (!part1.outputMode)
+				if (part1.mode != 1)
 				{
 					temp[tempParts] = part1;
 					tempParts++;
@@ -221,7 +290,7 @@ public class BasicItemTesslocatorPart extends BasicTesslocatorPart implements II
 		{
 			stack = handler.extractItem(currentSlot, 64, true);
 
-			if (!stack.isEmpty() && ItemFiltersAPI.filter(filter, stack))
+			if (!stack.isEmpty() && ItemFiltersAPI.filter(outputFilter, stack))
 			{
 				break;
 			}
@@ -236,7 +305,7 @@ public class BasicItemTesslocatorPart extends BasicTesslocatorPart implements II
 
 		int i = currentPart % tempParts;
 
-		if (ItemFiltersAPI.filter(temp[i].filter, stack))
+		if (ItemFiltersAPI.filter(temp[i].inputFilter, stack))
 		{
 			TileEntity outEntity = block.getWorld().getTileEntity(block.getPos().offset(temp[i].facing));
 
@@ -261,64 +330,18 @@ public class BasicItemTesslocatorPart extends BasicTesslocatorPart implements II
 	}
 
 	@Override
-	public void onRightClick(EntityPlayer player, EnumHand hand)
-	{
-		ItemStack stack1 = player.getHeldItem(hand);
-
-		if (!stack1.isEmpty())
-		{
-			IntOpenHashSet ores = new IntOpenHashSet(OreDictionary.getOreIDs(stack1));
-
-			int add = 0;
-
-			if (ores.contains(OreDictionary.getOreID("dustGlowstone")))
-			{
-				add = 1;
-			}
-			else if (ores.contains(OreDictionary.getOreID("glowstone")))
-			{
-				add = 4;
-			}
-
-			if (add > 0)
-			{
-				if (boost < TesslocatorConfig.general.boost_max)
-				{
-					boost += add;
-
-					if (boost > TesslocatorConfig.general.boost_max)
-					{
-						boost = TesslocatorConfig.general.boost_max;
-					}
-
-					if (!player.capabilities.isCreativeMode)
-					{
-						stack1.shrink(1);
-					}
-				}
-
-				ITextComponent component = new TextComponentString(boost + " / " + TesslocatorConfig.general.boost_max);
-				component.getStyle().setColor(TextFormatting.GOLD);
-				player.sendStatusMessage(component, true);
-				return;
-			}
-		}
-
-		if (!player.world.isRemote)
-		{
-			outputMode = !outputMode;
-			block.rerender();
-		}
-	}
-
-	@Override
 	public void drop(World world, BlockPos pos)
 	{
 		super.drop(world, pos);
 
-		if (boost > 0)
+		for (int i = 0; i < other.getSlots(); i++)
 		{
-			Block.spawnAsEntity(world, pos, new ItemStack(Items.GLOWSTONE_DUST, boost));
+			Block.spawnAsEntity(world, pos, other.getStackInSlot(i));
+		}
+
+		for (ItemStack stack : buffer)
+		{
+			Block.spawnAsEntity(world, pos, stack);
 		}
 	}
 
@@ -432,5 +455,19 @@ public class BasicItemTesslocatorPart extends BasicTesslocatorPart implements II
 	public void setStackInSlot(int slot, ItemStack stack)
 	{
 		buffer[slot] = stack;
+	}
+
+	@Override
+	@Nullable
+	public Container getGuiContainer(EntityPlayer player)
+	{
+		return new ContainerBasicItemTesslocator(this, player);
+	}
+
+	@Override
+	@Nullable
+	public Object getGuiScreen(Container container)
+	{
+		return new GuiBasicItemTesslocator((ContainerBasicItemTesslocator) container);
 	}
 }

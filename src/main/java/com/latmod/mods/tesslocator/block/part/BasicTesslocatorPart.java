@@ -11,7 +11,7 @@ import net.minecraft.util.EnumHand;
  */
 public abstract class BasicTesslocatorPart extends TesslocatorPart
 {
-	public boolean outputMode = false;
+	public int mode = 0;
 
 	public BasicTesslocatorPart(TileTesslocator t, EnumFacing f)
 	{
@@ -23,9 +23,9 @@ public abstract class BasicTesslocatorPart extends TesslocatorPart
 	{
 		super.writeData(nbt);
 
-		if (outputMode)
+		if (mode > 0)
 		{
-			nbt.setBoolean("output_mode", true);
+			nbt.setByte("output_mode", (byte) mode);
 		}
 	}
 
@@ -33,22 +33,23 @@ public abstract class BasicTesslocatorPart extends TesslocatorPart
 	public void readData(NBTTagCompound nbt)
 	{
 		super.readData(nbt);
-		outputMode = nbt.getBoolean("output_mode");
+		mode = nbt.getByte("output_mode");
 	}
 
 	@Override
 	public int getColor(int layer)
 	{
-		return outputMode ? 0xFFFF9400 : 0xFF00B2FF;
+		if (mode == 2)
+		{
+			return layer == 0 ? 0xFFFF9400 : 0xFF00B2FF;
+		}
+
+		return mode == 1 ? 0xFFFF9400 : 0xFF00B2FF;
 	}
 
 	@Override
 	public void onRightClick(EntityPlayer player, EnumHand hand)
 	{
-		if (!player.world.isRemote)
-		{
-			outputMode = !outputMode;
-			block.rerender();
-		}
+		openGui(player);
 	}
 }
