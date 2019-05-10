@@ -33,6 +33,7 @@ import java.util.Arrays;
 public class BasicItemTesslocatorPart extends BasicTesslocatorPart implements IItemHandlerModifiable
 {
 	private final BasicItemTesslocatorPart[] temp = new BasicItemTesslocatorPart[5];
+	public static boolean ignoreMarkDirty = false;
 
 	public ItemStack inputFilter = ItemStack.EMPTY;
 	public ItemStack outputFilter = ItemStack.EMPTY;
@@ -75,6 +76,15 @@ public class BasicItemTesslocatorPart extends BasicTesslocatorPart implements II
 
 			return 0;
 		}
+
+		@Override
+		protected void onContentsChanged(int slot)
+		{
+			if (!ignoreMarkDirty)
+			{
+				block.markDirty();
+			}
+		}
 	};
 
 	public int currentSlot = 0;
@@ -108,13 +118,21 @@ public class BasicItemTesslocatorPart extends BasicTesslocatorPart implements II
 			nbt.setTag("output_filter", outputFilter.serializeNBT());
 		}
 
+		NBTTagList otherTag = new NBTTagList();
+
 		for (int i = 0; i < other.getSlots(); i++)
 		{
 			if (!other.getStackInSlot(i).isEmpty())
 			{
-				nbt.setTag("other", other.serializeNBT());
-				break;
+				NBTTagCompound nbt1 = other.getStackInSlot(i).serializeNBT();
+				nbt1.setByte("slot", (byte) i);
+				otherTag.appendTag(nbt1);
 			}
+		}
+
+		if (!otherTag.isEmpty())
+		{
+			nbt.setTag("other", otherTag);
 		}
 
 		if (currentSlot > 0)
@@ -132,7 +150,7 @@ public class BasicItemTesslocatorPart extends BasicTesslocatorPart implements II
 			nbt.setByte("current_part", (byte) currentPart);
 		}
 
-		NBTTagList list = new NBTTagList();
+		NBTTagList bufferTag = new NBTTagList();
 
 		for (int i = 0; i < buffer.length; i++)
 		{
@@ -140,13 +158,13 @@ public class BasicItemTesslocatorPart extends BasicTesslocatorPart implements II
 			{
 				NBTTagCompound nbt1 = buffer[i].serializeNBT();
 				nbt1.setByte("slot", (byte) i);
-				list.appendTag(nbt1);
+				bufferTag.appendTag(nbt1);
 			}
 		}
 
-		if (!list.isEmpty())
+		if (!bufferTag.isEmpty())
 		{
-			nbt.setTag("buffer", list);
+			nbt.setTag("buffer", bufferTag);
 		}
 	}
 
@@ -156,13 +174,27 @@ public class BasicItemTesslocatorPart extends BasicTesslocatorPart implements II
 		super.readData(nbt);
 		inputFilter = nbt.hasKey("input_filter") ? new ItemStack(nbt.getCompoundTag("input_filter")) : ItemStack.EMPTY;
 		outputFilter = nbt.hasKey("output_filter") ? new ItemStack(nbt.getCompoundTag("output_filter")) : ItemStack.EMPTY;
+		other.setSize(2);
 
-		int speedBoost = nbt.getByte("boost") & 0xFF;
-		int stackBoost = nbt.getByte("stack") & 0xFF;
+		NBTTagList otherTag = nbt.getTagList("other", Constants.NBT.TAG_COMPOUND);
 
-		if (speedBoost > 0 || stackBoost > 0)
+		for (int i = 0; i < otherTag.tagCount(); i++)
 		{
-			other.setSize(2);
+			NBTTagCompound nbt1 = otherTag.getCompoundTagAt(i);
+			ItemStack stack = new ItemStack(nbt1);
+
+			if (!stack.isEmpty())
+			{
+				ignoreMarkDirty = true;
+				other.setStackInSlot(nbt1.getByte("slot"), stack);
+				ignoreMarkDirty = false;
+			}
+		}
+
+		if (otherTag.isEmpty())
+		{
+			int speedBoost = nbt.getByte("boost") & 0xFF;
+			int stackBoost = nbt.getByte("stack") & 0xFF;
 
 			if (speedBoost > 0)
 			{
@@ -173,10 +205,6 @@ public class BasicItemTesslocatorPart extends BasicTesslocatorPart implements II
 			{
 				other.setStackInSlot(1, new ItemStack(Items.DIAMOND, stackBoost));
 			}
-		}
-		else if (nbt.hasKey("other"))
-		{
-			other.deserializeNBT(nbt.getCompoundTag("other"));
 		}
 
 		currentSlot = nbt.getInteger("current_slot");
@@ -191,11 +219,11 @@ public class BasicItemTesslocatorPart extends BasicTesslocatorPart implements II
 
 		Arrays.fill(buffer, ItemStack.EMPTY);
 
-		NBTTagList list = nbt.getTagList("buffer", Constants.NBT.TAG_COMPOUND);
+		NBTTagList bufferTag = nbt.getTagList("buffer", Constants.NBT.TAG_COMPOUND);
 
-		for (int i = 0; i < list.tagCount(); i++)
+		for (int i = 0; i < bufferTag.tagCount(); i++)
 		{
-			NBTTagCompound nbt1 = list.getCompoundTagAt(i);
+			NBTTagCompound nbt1 = bufferTag.getCompoundTagAt(i);
 			ItemStack stack = new ItemStack(nbt1);
 
 			if (!stack.isEmpty())
