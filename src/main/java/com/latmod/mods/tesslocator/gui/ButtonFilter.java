@@ -13,9 +13,9 @@ import net.minecraft.item.ItemStack;
  */
 public class ButtonFilter extends ButtonFakeSlot
 {
-	public ButtonFilter(int id, int x, int y)
+	public ButtonFilter(int id, int x, int y, String s)
 	{
-		super(id, x, y, "");
+		super(id, x, y, 16, 16, s);
 	}
 
 	public ItemStack getStack()

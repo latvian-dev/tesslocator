@@ -1,5 +1,6 @@
 package com.latmod.mods.tesslocator.gui;
 
+import com.latmod.mods.tesslocator.TesslocatorConfig;
 import com.latmod.mods.tesslocator.block.part.BasicItemTesslocatorPart;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
@@ -19,16 +20,23 @@ public class ContainerBasicItemTesslocator extends Container
 	{
 		part = p;
 
-		addSlotToContainer(new SlotItemHandler(part.other, 0, 143, 10));
-		addSlotToContainer(new SlotItemHandler(part.other, 1, 143, 28));
-
-		for (int y = 0; y < 2; y++)
+		addSlotToContainer(new SlotItemHandler(part.other, 0, 116, 19)
 		{
-			for (int x = 0; x < 4; x++)
+			@Override
+			public int getSlotStackLimit()
 			{
-				addSlotToContainer(new SlotItemHandler(part, x + y * 4, 53 + x * 18, 10 + y * 18));
+				return TesslocatorConfig.basic_item.speed_boost_max;
 			}
-		}
+		});
+
+		addSlotToContainer(new SlotItemHandler(part.other, 1, 152, 19)
+		{
+			@Override
+			public int getSlotStackLimit()
+			{
+				return TesslocatorConfig.basic_item.stack_boost_max;
+			}
+		});
 
 		for (int k = 0; k < 3; ++k)
 		{
@@ -61,14 +69,14 @@ public class ContainerBasicItemTesslocator extends Container
 			ItemStack stack1 = slot.getStack();
 			stack = stack1.copy();
 
-			if (index < 10)
+			if (index < 2)
 			{
-				if (!mergeItemStack(stack1, 10, inventorySlots.size(), true))
+				if (!mergeItemStack(stack1, 2, inventorySlots.size(), true))
 				{
 					return ItemStack.EMPTY;
 				}
 			}
-			else if (!mergeItemStack(stack1, 0, 10, false))
+			else if (!mergeItemStack(stack1, 0, 2, false))
 			{
 				return ItemStack.EMPTY;
 			}

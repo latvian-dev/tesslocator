@@ -9,9 +9,9 @@ import net.minecraft.client.renderer.GlStateManager;
  */
 public class ButtonFakeSlot extends GuiButton
 {
-	public ButtonFakeSlot(int id, int x, int y, String title)
+	public ButtonFakeSlot(int id, int x, int y, int w, int h, String title)
 	{
-		super(id, x, y, 16, 16, title);
+		super(id, x, y, w, h, title);
 	}
 
 	@Override
@@ -23,15 +23,20 @@ public class ButtonFakeSlot extends GuiButton
 
 			if (hovered)
 			{
-				GlStateManager.color(1F, 1F, 1F, 1F);
-				GlStateManager.disableLighting();
-				GlStateManager.disableDepth();
-				GlStateManager.colorMask(true, true, true, false);
-				drawGradientRect(x, y, x + width, y + height, -2130706433, -2130706433);
-				GlStateManager.colorMask(true, true, true, true);
-				GlStateManager.enableLighting();
-				GlStateManager.enableDepth();
+				draw();
 			}
 		}
+	}
+
+	public void draw()
+	{
+		GlStateManager.color(1F, 1F, 1F, 1F);
+		GlStateManager.disableLighting();
+		GlStateManager.disableDepth();
+		GlStateManager.colorMask(true, true, true, false);
+		drawGradientRect(x, y, x + width, y + height, -2130706433, -2130706433);
+		GlStateManager.colorMask(true, true, true, true);
+		GlStateManager.enableLighting();
+		GlStateManager.enableDepth();
 	}
 }

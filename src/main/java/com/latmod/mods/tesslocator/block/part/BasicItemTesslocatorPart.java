@@ -20,24 +20,21 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
-import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemHandlerHelper;
 import net.minecraftforge.items.ItemStackHandler;
 
 import javax.annotation.Nullable;
-import java.util.Arrays;
 
 /**
  * @author LatvianModder
  */
-public class BasicItemTesslocatorPart extends BasicTesslocatorPart implements IItemHandlerModifiable
+public class BasicItemTesslocatorPart extends BasicTesslocatorPart
 {
 	private final BasicItemTesslocatorPart[] temp = new BasicItemTesslocatorPart[5];
 	public static boolean ignoreMarkDirty = false;
 
 	public ItemStack inputFilter = ItemStack.EMPTY;
 	public ItemStack outputFilter = ItemStack.EMPTY;
-	public final ItemStack[] buffer = new ItemStack[8];
 
 	public final ItemStackHandler other = new ItemStackHandler(2)
 	{
@@ -94,7 +91,6 @@ public class BasicItemTesslocatorPart extends BasicTesslocatorPart implements II
 	public BasicItemTesslocatorPart(TileTesslocator t, EnumFacing f)
 	{
 		super(t, f);
-		Arrays.fill(buffer, ItemStack.EMPTY);
 	}
 
 	@Override
@@ -149,23 +145,6 @@ public class BasicItemTesslocatorPart extends BasicTesslocatorPart implements II
 		{
 			nbt.setByte("current_part", (byte) currentPart);
 		}
-
-		NBTTagList bufferTag = new NBTTagList();
-
-		for (int i = 0; i < buffer.length; i++)
-		{
-			if (!buffer[i].isEmpty())
-			{
-				NBTTagCompound nbt1 = buffer[i].serializeNBT();
-				nbt1.setByte("slot", (byte) i);
-				bufferTag.appendTag(nbt1);
-			}
-		}
-
-		if (!bufferTag.isEmpty())
-		{
-			nbt.setTag("buffer", bufferTag);
-		}
 	}
 
 	@Override
@@ -216,21 +195,6 @@ public class BasicItemTesslocatorPart extends BasicTesslocatorPart implements II
 
 		cooldown = nbt.getByte("cooldown") & 0xFF;
 		currentPart = nbt.getByte("current_part") & 0xFF;
-
-		Arrays.fill(buffer, ItemStack.EMPTY);
-
-		NBTTagList bufferTag = nbt.getTagList("buffer", Constants.NBT.TAG_COMPOUND);
-
-		for (int i = 0; i < bufferTag.tagCount(); i++)
-		{
-			NBTTagCompound nbt1 = bufferTag.getCompoundTagAt(i);
-			ItemStack stack = new ItemStack(nbt1);
-
-			if (!stack.isEmpty())
-			{
-				buffer[nbt1.getByte("slot")] = stack;
-			}
-		}
 	}
 
 	@Override
@@ -262,6 +226,16 @@ public class BasicItemTesslocatorPart extends BasicTesslocatorPart implements II
 
 		cooldown = TesslocatorConfig.basic_item.speed_boost_starting - (int) (other.getStackInSlot(0).getCount() * TesslocatorConfig.basic_item.speed_boost_multiplier);
 
+		int stackBoost = other.getStackInSlot(1).getCount() + 1;
+
+		for (int i = 0; i < stackBoost; i++)
+		{
+			moveItems();
+		}
+	}
+
+	private void moveItems()
+	{
 		int tempParts = 0;
 
 		for (TesslocatorPart part : block.parts)
@@ -366,123 +340,6 @@ public class BasicItemTesslocatorPart extends BasicTesslocatorPart implements II
 		{
 			Block.spawnAsEntity(world, pos, other.getStackInSlot(i));
 		}
-
-		for (ItemStack stack : buffer)
-		{
-			Block.spawnAsEntity(world, pos, stack);
-		}
-	}
-
-	@Override
-	public int getSlots()
-	{
-		return buffer.length;
-	}
-
-	@Override
-	public ItemStack getStackInSlot(int slot)
-	{
-		return buffer[slot];
-	}
-
-	@Override
-	public ItemStack insertItem(int slot, ItemStack stack, boolean simulate)
-	{
-		if (stack.isEmpty())
-		{
-			return ItemStack.EMPTY;
-		}
-
-		ItemStack existing = buffer[slot];
-
-		int limit = getStackLimit(slot, stack);
-
-		if (!existing.isEmpty())
-		{
-			if (!ItemHandlerHelper.canItemStacksStack(stack, existing))
-			{
-				return stack;
-			}
-
-			limit -= existing.getCount();
-		}
-
-		if (limit <= 0)
-		{
-			return stack;
-		}
-
-		boolean reachedLimit = stack.getCount() > limit;
-
-		if (!simulate)
-		{
-			if (existing.isEmpty())
-			{
-				buffer[slot] = reachedLimit ? ItemHandlerHelper.copyStackWithSize(stack, limit) : stack;
-			}
-			else
-			{
-				existing.grow(reachedLimit ? limit : stack.getCount());
-			}
-
-			block.markDirty();
-		}
-
-		return reachedLimit ? ItemHandlerHelper.copyStackWithSize(stack, stack.getCount() - limit) : ItemStack.EMPTY;
-	}
-
-	@Override
-	public ItemStack extractItem(int slot, int amount, boolean simulate)
-	{
-		if (amount == 0)
-		{
-			return ItemStack.EMPTY;
-		}
-
-		ItemStack existing = buffer[slot];
-
-		if (existing.isEmpty())
-		{
-			return ItemStack.EMPTY;
-		}
-
-		int toExtract = Math.min(amount, existing.getMaxStackSize());
-
-		if (existing.getCount() <= toExtract)
-		{
-			if (!simulate)
-			{
-				buffer[slot] = ItemStack.EMPTY;
-				block.markDirty();
-			}
-
-			return existing;
-		}
-
-		if (!simulate)
-		{
-			buffer[slot] = ItemHandlerHelper.copyStackWithSize(existing, existing.getCount() - toExtract);
-			block.markDirty();
-		}
-
-		return ItemHandlerHelper.copyStackWithSize(existing, toExtract);
-	}
-
-	protected int getStackLimit(int slot, ItemStack stack)
-	{
-		return Math.min(getSlotLimit(slot), stack.getMaxStackSize());
-	}
-
-	@Override
-	public int getSlotLimit(int slot)
-	{
-		return 64;
-	}
-
-	@Override
-	public void setStackInSlot(int slot, ItemStack stack)
-	{
-		buffer[slot] = stack;
 	}
 
 	@Override
