@@ -292,7 +292,7 @@ public class BasicItemTesslocatorPart extends BasicTesslocatorPart
 		{
 			stack = handler.extractItem(currentSlot, 64, true);
 
-			if (!stack.isEmpty() && ItemFiltersAPI.filter(outputFilter, stack))
+			if (!(stack == ItemStack.EMPTY || stack.isEmpty()) && ItemFiltersAPI.filter(outputFilter, stack))
 			{
 				break;
 			}

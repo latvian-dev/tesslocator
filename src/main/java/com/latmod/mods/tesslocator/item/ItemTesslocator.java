@@ -121,8 +121,6 @@ public class ItemTesslocator extends Item
 			tooltip.add(TextFormatting.RED + "Currently disabled, because it's not finished!");
 		}
 
-		tooltip.add(I18n.format("item.tesslocator.tooltip"));
-
 		if (type.isAdvanced)
 		{
 			int col = stack.hasTagCompound() ? (stack.getTagCompound().getByte("colors") & 0xFF) : 0;

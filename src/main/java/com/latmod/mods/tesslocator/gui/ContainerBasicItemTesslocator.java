@@ -12,7 +12,7 @@ import net.minecraftforge.items.SlotItemHandler;
 /**
  * @author LatvianModder
  */
-public class ContainerBasicItemTesslocator extends Container
+public class ContainerBasicItemTesslocator extends Container implements IGhostItemHandler
 {
 	public final BasicItemTesslocatorPart part;
 
@@ -100,20 +100,38 @@ public class ContainerBasicItemTesslocator extends Container
 		if (id == 0)
 		{
 			part.mode = (part.mode + 1) % 3;
+			part.block.markDirty();
 			part.block.rerender();
 			return true;
 		}
 		else if (id == 1)
 		{
 			part.inputFilter = ItemHandlerHelper.copyStackWithSize(player.inventory.getItemStack(), 1);
+			part.block.markDirty();
 			return true;
 		}
 		else if (id == 2)
 		{
 			part.outputFilter = ItemHandlerHelper.copyStackWithSize(player.inventory.getItemStack(), 1);
+			part.block.markDirty();
 			return true;
 		}
 
 		return false;
+	}
+
+	@Override
+	public void setGhostItem(int slot, ItemStack stack)
+	{
+		if (slot == 0)
+		{
+			part.inputFilter = ItemHandlerHelper.copyStackWithSize(stack, 1);
+			part.block.markDirty();
+		}
+		else if (slot == 1)
+		{
+			part.outputFilter = ItemHandlerHelper.copyStackWithSize(stack, 1);
+			part.block.markDirty();
+		}
 	}
 }
