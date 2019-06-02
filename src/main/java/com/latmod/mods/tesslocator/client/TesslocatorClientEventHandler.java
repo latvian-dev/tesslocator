@@ -51,7 +51,7 @@ public class TesslocatorClientEventHandler
 
 					if (tile.parts[tintIndex % 6] != null)
 					{
-						return tile.parts[tintIndex % 6].getColor(tintIndex / 6);
+						return 0xFF000000 | tile.parts[tintIndex % 6].getColor(tintIndex / 6);
 					}
 				}
 			}
@@ -65,7 +65,7 @@ public class TesslocatorClientEventHandler
 	{
 		event.getItemColors().registerItemColorHandler((stack, tintIndex) -> {
 			int colors = stack.hasTagCompound() ? stack.getTagCompound().getByte("colors") & 0xFF : 0;
-			return EnumDyeColor.byMetadata((colors >> (tintIndex * 4)) & 0xF).getColorValue();
+			return 0xFF000000 | EnumDyeColor.byMetadata((colors >> (tintIndex * 4)) & 0xF).getColorValue();
 		}, TesslocatorItems.ADVANCED_ITEM_TESSLOCATOR, TesslocatorItems.ADVANCED_FLUID_TESSLOCATOR, TesslocatorItems.ADVANCED_ENERGY_TESSLOCATOR);
 
 		event.getBlockColors().registerBlockColorHandler((state, world, pos, tintIndex) -> {
@@ -79,7 +79,7 @@ public class TesslocatorClientEventHandler
 
 					if (tile.parts[tintIndex % 6] != null)
 					{
-						return tile.parts[tintIndex % 6].getColor(tintIndex / 6);
+						return 0xFF000000 | tile.parts[tintIndex % 6].getColor(tintIndex / 6);
 					}
 				}
 			}

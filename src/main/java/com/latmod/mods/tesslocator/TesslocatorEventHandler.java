@@ -1,22 +1,28 @@
 package com.latmod.mods.tesslocator;
 
 import com.latmod.mods.tesslocator.block.BlockTesslocator;
-import com.latmod.mods.tesslocator.block.TessNet;
 import com.latmod.mods.tesslocator.block.TileTesslocator;
 import com.latmod.mods.tesslocator.block.part.EnumPartType;
+import com.latmod.mods.tesslocator.data.TessNet;
 import com.latmod.mods.tesslocator.item.AdvancedTesslocatorColorRecipe;
 import com.latmod.mods.tesslocator.item.ItemTesslocator;
 import net.minecraft.block.Block;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
 import net.minecraft.item.crafting.IRecipe;
+import net.minecraft.nbt.CompressedStreamTools;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.registries.IForgeRegistry;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 
 /**
  * @author LatvianModder
@@ -45,10 +51,10 @@ public class TesslocatorEventHandler
 		IForgeRegistry<Item> r = event.getRegistry();
 		r.register(withName(new ItemTesslocator(EnumPartType.BASIC_ITEM), "basic_item_tesslocator"));
 		r.register(withName(new ItemTesslocator(EnumPartType.BASIC_FLUID).setDisabled(), "basic_fluid_tesslocator"));
-		r.register(withName(new ItemTesslocator(EnumPartType.BASIC_ENERGY).setDisabled(), "basic_energy_tesslocator"));
+		r.register(withName(new ItemTesslocator(EnumPartType.BASIC_ENERGY), "basic_energy_tesslocator"));
 		r.register(withName(new ItemTesslocator(EnumPartType.ADVANCED_ITEM).setDisabled(), "advanced_item_tesslocator"));
 		r.register(withName(new ItemTesslocator(EnumPartType.ADVANCED_FLUID).setDisabled(), "advanced_fluid_tesslocator"));
-		r.register(withName(new ItemTesslocator(EnumPartType.ADVANCED_ENERGY).setDisabled(), "advanced_energy_tesslocator"));
+		r.register(withName(new ItemTesslocator(EnumPartType.ADVANCED_ENERGY), "advanced_energy_tesslocator"));
 	}
 
 	@SubscribeEvent
@@ -58,11 +64,62 @@ public class TesslocatorEventHandler
 	}
 
 	@SubscribeEvent
-	public static void serverTick(TickEvent.ServerTickEvent event)
+	public static void worldLoaded(WorldEvent.Load event)
 	{
-		if (event.phase == TickEvent.Phase.END)
+		if (!event.getWorld().isRemote && event.getWorld().provider.getDimension() == 0)
 		{
-			TessNet.INSTANCE.update();
+			TessNet.SERVER = new TessNet();
+			File file = new File(event.getWorld().getSaveHandler().getWorldDirectory(), "data/tesslocators.nbt");
+
+			if (file.exists())
+			{
+				try
+				{
+					TessNet.SERVER.read(CompressedStreamTools.readCompressed(new FileInputStream(file)));
+				}
+				catch (Exception ex)
+				{
+					ex.printStackTrace();
+				}
+			}
+		}
+	}
+
+	@SubscribeEvent
+	public static void worldUnloaded(WorldEvent.Unload event)
+	{
+		if (TessNet.SERVER != null && !event.getWorld().isRemote && event.getWorld().provider.getDimension() == 0)
+		{
+			TessNet.SERVER = null;
+		}
+	}
+
+	@SubscribeEvent
+	public static void worldSaved(WorldEvent.Save event)
+	{
+		if (TessNet.SERVER != null && TessNet.SERVER.isDirty && !event.getWorld().isRemote)
+		{
+			try
+			{
+				File file = new File(event.getWorld().getSaveHandler().getWorldDirectory(), "data/tesslocators.nbt");
+
+				if (!file.exists())
+				{
+					if (!file.createNewFile())
+					{
+						return;
+					}
+				}
+
+				NBTTagCompound nbt = new NBTTagCompound();
+				TessNet.SERVER.write(nbt);
+				CompressedStreamTools.writeCompressed(nbt, new FileOutputStream(file));
+				TessNet.SERVER.isDirty = false;
+			}
+			catch (Exception ex)
+			{
+				ex.printStackTrace();
+			}
 		}
 	}
 }

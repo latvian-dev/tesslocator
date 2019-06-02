@@ -1,7 +1,6 @@
 package com.latmod.mods.tesslocator.item;
 
 import com.latmod.mods.tesslocator.block.BlockTesslocator;
-import com.latmod.mods.tesslocator.block.TessNet;
 import com.latmod.mods.tesslocator.block.TileTesslocator;
 import com.latmod.mods.tesslocator.block.part.EnumPartType;
 import com.latmod.mods.tesslocator.block.part.TesslocatorPart;
@@ -87,7 +86,6 @@ public class ItemTesslocator extends Item
 				tile.parts[opposite.getIndex()] = part;
 				part.onPlaced(player, stack);
 				tileEntity.markDirty();
-				TessNet.INSTANCE.refresh();
 			}
 
 			IBlockState state = world.getBlockState(pos);
@@ -124,8 +122,10 @@ public class ItemTesslocator extends Item
 		if (type.isAdvanced)
 		{
 			int col = stack.hasTagCompound() ? (stack.getTagCompound().getByte("colors") & 0xFF) : 0;
-			tooltip.add("Color 1: " + I18n.format("item.fireworksCharge." + EnumDyeColor.byMetadata(col & 0xF).getTranslationKey()));
-			tooltip.add("Color 2: " + I18n.format("item.fireworksCharge." + EnumDyeColor.byMetadata((col >> 4) & 0xF).getTranslationKey()));
+			tooltip.add("Color A: " + I18n.format("item.fireworksCharge." + EnumDyeColor.byMetadata(col & 0xF).getTranslationKey()));
+			tooltip.add("Color B: " + I18n.format("item.fireworksCharge." + EnumDyeColor.byMetadata((col >> 4) & 0xF).getTranslationKey()));
+			tooltip.add("");
+			tooltip.add(TextFormatting.DARK_GRAY + "Change colors by holding dye in each hand and right-clicking on block");
 		}
 	}
 }

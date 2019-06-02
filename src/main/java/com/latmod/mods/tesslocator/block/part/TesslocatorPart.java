@@ -40,6 +40,10 @@ public abstract class TesslocatorPart implements ITickable
 	{
 	}
 
+	public void clearCache()
+	{
+	}
+
 	public abstract boolean hasCapability(Capability<?> capability);
 
 	@Nullable

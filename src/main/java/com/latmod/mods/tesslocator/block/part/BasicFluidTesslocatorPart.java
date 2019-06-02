@@ -1,8 +1,10 @@
 package com.latmod.mods.tesslocator.block.part;
 
 import com.latmod.mods.tesslocator.block.TileTesslocator;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.fluids.FluidStack;
 
@@ -60,5 +62,13 @@ public class BasicFluidTesslocatorPart extends BasicTesslocatorPart
 	@Override
 	public void update()
 	{
+	}
+
+	@Override
+	public void onRightClick(EntityPlayer player, EnumHand hand)
+	{
+		mode = 1 - mode;
+		block.markDirty();
+		block.rerender();
 	}
 }

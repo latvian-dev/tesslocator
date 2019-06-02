@@ -63,6 +63,7 @@ public class TileTesslocator extends TileEntity implements ITickable
 				{
 					parts[s] = type.provider.createPart(this, EnumFacing.VALUES[s]);
 					parts[s].readData(nbt1);
+					parts[s].clearCache();
 				}
 			}
 		}
@@ -71,15 +72,29 @@ public class TileTesslocator extends TileEntity implements ITickable
 	@Override
 	public boolean hasCapability(Capability<?> capability, @Nullable EnumFacing facing)
 	{
-		return facing != null && parts[facing.getIndex()] != null && parts[facing.getIndex()].hasCapability(capability) || super.hasCapability(capability, facing);
+		return facing != null && world != null && !world.isRemote && parts[facing.getIndex()] != null && parts[facing.getIndex()].hasCapability(capability) || super.hasCapability(capability, facing);
 	}
 
 	@Nullable
 	@Override
 	public <T> T getCapability(Capability<T> capability, @Nullable EnumFacing facing)
 	{
-		Object object = facing != null && parts[facing.getIndex()] != null ? parts[facing.getIndex()].getCapability(capability) : null;
+		Object object = world != null && !world.isRemote && facing != null && parts[facing.getIndex()] != null ? parts[facing.getIndex()].getCapability(capability) : null;
 		return object != null ? (T) object : super.getCapability(capability, facing);
+	}
+
+	@Override
+	public void updateContainingBlockInfo()
+	{
+		super.updateContainingBlockInfo();
+
+		for (TesslocatorPart part : parts)
+		{
+			if (part != null)
+			{
+				part.clearCache();
+			}
+		}
 	}
 
 	@Override
@@ -127,28 +142,6 @@ public class TileTesslocator extends TileEntity implements ITickable
 	public void markDirty()
 	{
 		isDirty = true;
-	}
-
-	@Override
-	public void invalidate()
-	{
-		if (hasWorld())
-		{
-			TessNet.INSTANCE.refresh();
-		}
-
-		super.invalidate();
-	}
-
-	@Override
-	public void setWorld(World world)
-	{
-		super.setWorld(world);
-
-		if (hasWorld())
-		{
-			TessNet.INSTANCE.refresh();
-		}
 	}
 
 	@Override
