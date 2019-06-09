@@ -28,7 +28,7 @@ import javax.annotation.Nullable;
 /**
  * @author LatvianModder
  */
-public class BasicItemTesslocatorPart extends BasicTesslocatorPart
+public class BasicItemTesslocatorPart extends BasicTesslocatorPart implements IItemHandler
 {
 	private final BasicItemTesslocatorPart[] temp = new BasicItemTesslocatorPart[5];
 	public static boolean ignoreMarkDirty = false;
@@ -329,6 +329,11 @@ public class BasicItemTesslocatorPart extends BasicTesslocatorPart
 
 		currentSlot++;
 		currentPart++;
+
+		if (currentPart >= 256)
+		{
+			currentPart = 0;
+		}
 	}
 
 	@Override
@@ -354,5 +359,80 @@ public class BasicItemTesslocatorPart extends BasicTesslocatorPart
 	public Object getGuiScreen(Container container)
 	{
 		return new GuiBasicItemTesslocator((ContainerBasicItemTesslocator) container);
+	}
+
+	@Override
+	public int getSlots()
+	{
+		return 1;
+	}
+
+	@Override
+	public ItemStack getStackInSlot(int slot)
+	{
+		return ItemStack.EMPTY;
+	}
+
+	@Override
+	public ItemStack insertItem(int slot, ItemStack stack, boolean simulate)
+	{
+		int tempParts = 0;
+
+		for (TesslocatorPart part : block.parts)
+		{
+			if (part != this && part instanceof BasicItemTesslocatorPart)
+			{
+				BasicItemTesslocatorPart part1 = (BasicItemTesslocatorPart) part;
+
+				if (part1.mode != 1)
+				{
+					temp[tempParts] = part1;
+					tempParts++;
+				}
+			}
+		}
+
+		if (tempParts == 0)
+		{
+			return stack;
+		}
+
+		int i = currentPart % tempParts;
+
+		if (ItemFiltersAPI.filter(temp[i].inputFilter, stack))
+		{
+			TileEntity outEntity = block.getWorld().getTileEntity(block.getPos().offset(temp[i].facing));
+
+			if (outEntity != null)
+			{
+				IItemHandler outHandler = outEntity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, temp[i].facing.getOpposite());
+
+				if (outHandler != null)
+				{
+					currentPart++;
+
+					if (currentPart >= 256)
+					{
+						currentPart = 0;
+					}
+
+					return ItemHandlerHelper.insertItem(outHandler, stack, simulate);
+				}
+			}
+		}
+
+		return stack;
+	}
+
+	@Override
+	public ItemStack extractItem(int slot, int amount, boolean simulate)
+	{
+		return ItemStack.EMPTY;
+	}
+
+	@Override
+	public int getSlotLimit(int slot)
+	{
+		return 64;
 	}
 }
