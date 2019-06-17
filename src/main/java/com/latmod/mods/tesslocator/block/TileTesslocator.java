@@ -2,6 +2,7 @@ package com.latmod.mods.tesslocator.block;
 
 import com.latmod.mods.tesslocator.block.part.EnumPartType;
 import com.latmod.mods.tesslocator.block.part.TesslocatorPart;
+import com.latmod.mods.tesslocator.data.TessNet;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
@@ -155,7 +156,7 @@ public class TileTesslocator extends TileEntity implements ITickable
 			{
 				p++;
 
-				if (!world.isRemote)
+				if (!world.isRemote && TessNet.SERVER != null)
 				{
 					part.update();
 				}
