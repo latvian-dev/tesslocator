@@ -361,4 +361,18 @@ public class BlockTesslocator extends Block
 
 		return false;
 	}
+
+	@Override
+	@Deprecated
+	public void neighborChanged(IBlockState state, World world, BlockPos pos, Block block, BlockPos fromPos)
+	{
+		super.neighborChanged(state, world, pos, block, fromPos);
+
+		TileEntity tileEntity = world.getTileEntity(pos);
+
+		if (tileEntity instanceof TileTesslocator)
+		{
+			tileEntity.updateContainingBlockInfo();
+		}
+	}
 }

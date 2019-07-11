@@ -5,11 +5,18 @@ import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.resources.I18n;
+import net.minecraft.init.Items;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.TextFormatting;
+import net.minecraftforge.common.ForgeModContainer;
+import net.minecraftforge.fluids.FluidRegistry;
+import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.capability.IFluidHandlerItem;
+import net.minecraftforge.fluids.capability.wrappers.FluidBucketWrapper;
 
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,16 +24,40 @@ import java.util.List;
 /**
  * @author LatvianModder
  */
-public class GuiBasicItemTesslocator extends GuiContainer
+public class GuiBasicFluidTesslocator extends GuiContainer
 {
 	public static final ResourceLocation TEXTURE = new ResourceLocation(Tesslocator.MOD_ID, "textures/gui/basic_item_tesslocator.png");
 
-	public final ContainerBasicItemTesslocator container;
+	public final ContainerBasicFluidTesslocator container;
 
-	public GuiBasicItemTesslocator(ContainerBasicItemTesslocator c)
+	public GuiBasicFluidTesslocator(ContainerBasicFluidTesslocator c)
 	{
 		super(c);
 		container = c;
+	}
+
+	private static ItemStack getBucket(@Nullable FluidStack fs)
+	{
+		if (fs == null || fs.getFluid() == null)
+		{
+			return ItemStack.EMPTY;
+		}
+		else if (fs.getFluid() == FluidRegistry.WATER)
+		{
+			return new ItemStack(Items.WATER_BUCKET);
+		}
+		else if (fs.getFluid() == FluidRegistry.WATER)
+		{
+			return new ItemStack(Items.WATER_BUCKET);
+		}
+		else if (fs.getFluid() == FluidRegistry.WATER)
+		{
+			return new ItemStack(Items.WATER_BUCKET);
+		}
+
+		IFluidHandlerItem fluidHandler = new FluidBucketWrapper(new ItemStack(ForgeModContainer.getInstance().universalBucket));
+		fluidHandler.fill(fs, true);
+		return fluidHandler.getContainer();
 	}
 
 	@Override
@@ -46,7 +77,7 @@ public class GuiBasicItemTesslocator extends GuiContainer
 			@Override
 			public ItemStack getStack()
 			{
-				return container.part.mode == 1 ? ItemStack.EMPTY : container.part.inputFilter;
+				return container.part.mode == 1 ? ItemStack.EMPTY : getBucket(container.part.inputFilter);
 			}
 		});
 
@@ -55,7 +86,7 @@ public class GuiBasicItemTesslocator extends GuiContainer
 			@Override
 			public ItemStack getStack()
 			{
-				return container.part.mode == 0 ? ItemStack.EMPTY : container.part.outputFilter;
+				return container.part.mode == 0 ? ItemStack.EMPTY : getBucket(container.part.outputFilter);
 			}
 		});
 	}
@@ -158,7 +189,7 @@ public class GuiBasicItemTesslocator extends GuiContainer
 		{
 			drawTexturedModalRect(guiLeft + 43, guiTop + 18, 211, 34, 18, 18);
 		}
-		else if (container.part.outputFilter.isEmpty())
+		else if (container.part.outputFilter == null)
 		{
 			drawTexturedModalRect(guiLeft + 44, guiTop + 19, 228, 17, 16, 16);
 		}
@@ -167,7 +198,7 @@ public class GuiBasicItemTesslocator extends GuiContainer
 		{
 			drawTexturedModalRect(guiLeft + 7, guiTop + 18, 211, 34, 18, 18);
 		}
-		else if (container.part.inputFilter.isEmpty())
+		else if (container.part.inputFilter == null)
 		{
 			drawTexturedModalRect(guiLeft + 8, guiTop + 19, 228, 0, 16, 16);
 		}
@@ -176,7 +207,7 @@ public class GuiBasicItemTesslocator extends GuiContainer
 	@Override
 	protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY)
 	{
-		String s = I18n.format("item.tesslocator.basic_item_tesslocator.name");
+		String s = I18n.format("item.tesslocator.basic_fluid_tesslocator.name");
 		fontRenderer.drawString(s, (width - fontRenderer.getStringWidth(s)) / 2 - guiLeft, 6, 4210752);
 		fontRenderer.drawString(I18n.format("container.inventory"), 7, 40, 4210752);
 	}

@@ -225,13 +225,7 @@ public class BasicItemTesslocatorPart extends BasicTesslocatorPart implements II
 		}
 
 		cooldown = TesslocatorConfig.basic_item.speed_boost_starting - (int) (other.getStackInSlot(0).getCount() * TesslocatorConfig.basic_item.speed_boost_multiplier);
-
-		int stackBoost = other.getStackInSlot(1).getCount() + 1;
-
-		for (int i = 0; i < stackBoost; i++)
-		{
-			moveItems();
-		}
+		moveItems();
 	}
 
 	private void moveItems()
@@ -257,7 +251,7 @@ public class BasicItemTesslocatorPart extends BasicTesslocatorPart implements II
 			return;
 		}
 
-		TileEntity tileEntity = block.getWorld().getTileEntity(block.getPos().offset(facing));
+		TileEntity tileEntity = getFacingTile();
 
 		if (tileEntity == null)
 		{
@@ -278,61 +272,71 @@ public class BasicItemTesslocatorPart extends BasicTesslocatorPart implements II
 			return;
 		}
 
-		currentSlot = currentSlot % slots;
-		int originalSlot = currentSlot;
+		int stackBoost = other.getStackInSlot(1).getCount() + 1;
 
-		if (originalSlot < 0)
+		for (int x = 0; x < stackBoost; x++)
 		{
-			originalSlot = 0;
-		}
+			currentSlot = currentSlot % slots;
+			int originalSlot = currentSlot;
 
-		ItemStack stack;
-
-		while (true)
-		{
-			stack = handler.extractItem(currentSlot, 64, true);
-
-			if (!(stack == ItemStack.EMPTY || stack.isEmpty()) && ItemFiltersAPI.filter(outputFilter, stack))
+			if (originalSlot < 0)
 			{
-				break;
+				originalSlot = 0;
 			}
 
-			currentSlot = (currentSlot + 1) % slots;
+			ItemStack stack;
 
-			if (currentSlot == originalSlot)
+			while (true)
+			{
+				stack = handler.extractItem(currentSlot, 64, true);
+
+				if (!(stack == ItemStack.EMPTY || stack.isEmpty()) && ItemFiltersAPI.filter(outputFilter, stack))
+				{
+					break;
+				}
+
+				currentSlot = (currentSlot + 1) % slots;
+
+				if (currentSlot == originalSlot)
+				{
+					return;
+				}
+			}
+
+			if (stack.isEmpty())
 			{
 				return;
 			}
-		}
 
-		int i = currentPart % tempParts;
+			int i = currentPart % tempParts;
 
-		if (ItemFiltersAPI.filter(temp[i].inputFilter, stack))
-		{
-			TileEntity outEntity = block.getWorld().getTileEntity(block.getPos().offset(temp[i].facing));
-
-			if (outEntity != null)
+			if (ItemFiltersAPI.filter(temp[i].inputFilter, stack))
 			{
-				IItemHandler outHandler = outEntity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, temp[i].facing.getOpposite());
+				TileEntity outEntity = temp[i].getFacingTile();
 
-				if (outHandler != null)
+				if (outEntity != null)
 				{
-					ItemStack stack1 = ItemHandlerHelper.insertItem(outHandler, stack, false);
+					IItemHandler outHandler = outEntity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, temp[i].facing.getOpposite());
 
-					if (stack1.getCount() != stack.getCount())
+					if (outHandler != null)
 					{
-						handler.extractItem(currentSlot, stack.getCount() - stack1.getCount(), false);
+						ItemStack stack1 = ItemHandlerHelper.insertItem(outHandler, stack, false);
+
+						if (stack1.getCount() != stack.getCount())
+						{
+							handler.extractItem(currentSlot, stack.getCount() - stack1.getCount(), false);
+						}
 					}
 				}
 			}
-		}
 
-		currentSlot++;
-		currentPart++;
+			currentSlot++;
+			currentPart++;
 
-		if (currentPart >= 256)
-		{
-			currentPart = 0;
+			if (currentPart >= 256)
+			{
+				currentPart = 0;
+			}
 		}
 	}
 

@@ -1,5 +1,6 @@
 package com.latmod.mods.tesslocator.integration;
 
+import com.latmod.mods.tesslocator.gui.GuiBasicFluidTesslocator;
 import com.latmod.mods.tesslocator.gui.GuiBasicItemTesslocator;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.IModRegistry;
@@ -15,5 +16,6 @@ public class TesslocatorJEIIntegration implements IModPlugin
 	public void register(IModRegistry registry)
 	{
 		registry.addGhostIngredientHandler(GuiBasicItemTesslocator.class, new BasicItemTesslocatorJEI());
+		registry.addGhostIngredientHandler(GuiBasicFluidTesslocator.class, new BasicFluidTesslocatorJEI());
 	}
 }

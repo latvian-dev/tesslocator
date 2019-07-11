@@ -7,6 +7,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.ITickable;
@@ -23,11 +24,13 @@ public abstract class TesslocatorPart implements ITickable
 {
 	public final TileTesslocator block;
 	public final EnumFacing facing;
+	private TileEntity facingTile;
 
 	public TesslocatorPart(TileTesslocator t, EnumFacing f)
 	{
 		block = t;
 		facing = f;
+		facingTile = null;
 	}
 
 	public abstract EnumPartType getType();
@@ -42,6 +45,7 @@ public abstract class TesslocatorPart implements ITickable
 
 	public void clearCache()
 	{
+		facingTile = null;
 	}
 
 	public abstract boolean hasCapability(Capability<?> capability);
@@ -82,5 +86,17 @@ public abstract class TesslocatorPart implements ITickable
 	public Object getGuiScreen(Container container)
 	{
 		return null;
+	}
+
+	@Nullable
+	public TileEntity getFacingTile()
+	{
+		if (facingTile != null && !facingTile.isInvalid())
+		{
+			return facingTile;
+		}
+
+		facingTile = block.getWorld().getTileEntity(block.getPos().offset(facing));
+		return facingTile;
 	}
 }

@@ -15,5 +15,6 @@ public class TesslocatorNetHandler
 	{
 		NET = new SimpleNetworkWrapper(Tesslocator.MOD_ID);
 		NET.registerMessage(new MessageGhostItem.Handler(), MessageGhostItem.class, 0, Side.SERVER);
+		NET.registerMessage(new MessageGhostFluid.Handler(), MessageGhostFluid.class, 1, Side.SERVER);
 	}
 }

@@ -57,6 +57,17 @@ public class TesslocatorConfig
 
 	public static class BasicFluid
 	{
+		@Config.RangeInt(min = 0, max = 64)
+		public int speed_boost_max = 8;
+
+		@Config.RangeDouble(min = 1)
+		public double speed_boost_multiplier = 2;
+
+		@Config.RangeInt(min = 1)
+		public int speed_boost_starting = 16;
+
+		@Config.RangeInt(min = 0, max = 16)
+		public int stack_boost_max = 3;
 	}
 
 	public static class BasicEnergy
