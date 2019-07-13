@@ -10,19 +10,13 @@ import net.minecraft.block.Block;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
 import net.minecraft.item.crafting.IRecipe;
-import net.minecraft.nbt.CompressedStreamTools;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.event.RegistryEvent;
-import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.registries.IForgeRegistry;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 
 /**
  * @author LatvianModder
@@ -64,62 +58,11 @@ public class TesslocatorEventHandler
 	}
 
 	@SubscribeEvent
-	public static void worldLoaded(WorldEvent.Load event)
+	public static void serverTick(TickEvent.ServerTickEvent event)
 	{
-		if (!event.getWorld().isRemote && event.getWorld().provider.getDimension() == 0)
+		if (TessNet.SERVER != null && event.phase == TickEvent.Phase.START)
 		{
-			TessNet.SERVER = new TessNet();
-			File file = new File(event.getWorld().getSaveHandler().getWorldDirectory(), "data/tesslocators.nbt");
-
-			if (file.exists())
-			{
-				try
-				{
-					TessNet.SERVER.read(CompressedStreamTools.readCompressed(new FileInputStream(file)));
-				}
-				catch (Exception ex)
-				{
-					ex.printStackTrace();
-				}
-			}
-		}
-	}
-
-	@SubscribeEvent
-	public static void worldUnloaded(WorldEvent.Unload event)
-	{
-		if (TessNet.SERVER != null && !event.getWorld().isRemote && event.getWorld().provider.getDimension() == 0)
-		{
-			TessNet.SERVER = null;
-		}
-	}
-
-	@SubscribeEvent
-	public static void worldSaved(WorldEvent.Save event)
-	{
-		if (TessNet.SERVER != null && TessNet.SERVER.isDirty && !event.getWorld().isRemote)
-		{
-			try
-			{
-				File file = new File(event.getWorld().getSaveHandler().getWorldDirectory(), "data/tesslocators.nbt");
-
-				if (!file.exists())
-				{
-					if (!file.createNewFile())
-					{
-						return;
-					}
-				}
-
-				NBTTagCompound nbt = new NBTTagCompound();
-				TessNet.SERVER.write(nbt);
-				CompressedStreamTools.writeCompressed(nbt, new FileOutputStream(file));
-				TessNet.SERVER.isDirty = false;
-			}
-			catch (Exception ex)
-			{
-				ex.printStackTrace();
-			}
+			TessNet.SERVER.update();
 		}
 	}
 }

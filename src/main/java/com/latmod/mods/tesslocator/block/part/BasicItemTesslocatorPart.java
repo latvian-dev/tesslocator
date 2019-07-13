@@ -3,6 +3,7 @@ package com.latmod.mods.tesslocator.block.part;
 import com.latmod.mods.itemfilters.api.ItemFiltersAPI;
 import com.latmod.mods.tesslocator.TesslocatorConfig;
 import com.latmod.mods.tesslocator.block.TileTesslocator;
+import com.latmod.mods.tesslocator.data.TessNet;
 import com.latmod.mods.tesslocator.gui.ContainerBasicItemTesslocator;
 import com.latmod.mods.tesslocator.gui.GuiBasicItemTesslocator;
 import net.minecraft.block.Block;
@@ -211,7 +212,7 @@ public class BasicItemTesslocatorPart extends BasicTesslocatorPart implements II
 	}
 
 	@Override
-	public void update()
+	public void update(TessNet net)
 	{
 		if (mode == 0)
 		{

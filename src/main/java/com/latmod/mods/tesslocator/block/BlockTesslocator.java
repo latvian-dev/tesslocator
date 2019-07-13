@@ -2,6 +2,7 @@ package com.latmod.mods.tesslocator.block;
 
 import com.latmod.mods.tesslocator.Tesslocator;
 import com.latmod.mods.tesslocator.block.part.AdvancedTesslocatorPart;
+import com.latmod.mods.tesslocator.data.TessNet;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
@@ -346,6 +347,11 @@ public class BlockTesslocator extends Block
 				}
 
 				tile.parts[side.getIndex()] = null;
+
+				if (!world.isRemote && TessNet.SERVER != null)
+				{
+					TessNet.SERVER.markDirty();
+				}
 
 				if (hasParts(tile))
 				{

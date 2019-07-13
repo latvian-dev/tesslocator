@@ -1,6 +1,7 @@
 package com.latmod.mods.tesslocator.block.part;
 
 import com.latmod.mods.tesslocator.block.TileTesslocator;
+import com.latmod.mods.tesslocator.data.TessNet;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
@@ -58,7 +59,7 @@ public class AdvancedItemTesslocatorPart extends AdvancedTesslocatorPart
 	}
 
 	@Override
-	public void update()
+	public void update(TessNet net)
 	{
 	}
 }

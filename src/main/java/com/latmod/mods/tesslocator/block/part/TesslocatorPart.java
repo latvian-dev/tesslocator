@@ -2,6 +2,7 @@ package com.latmod.mods.tesslocator.block.part;
 
 import com.latmod.mods.tesslocator.Tesslocator;
 import com.latmod.mods.tesslocator.block.TileTesslocator;
+import com.latmod.mods.tesslocator.data.TessNet;
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
@@ -10,7 +11,6 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
-import net.minecraft.util.ITickable;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.Capability;
@@ -20,7 +20,7 @@ import javax.annotation.Nullable;
 /**
  * @author LatvianModder
  */
-public abstract class TesslocatorPart implements ITickable
+public abstract class TesslocatorPart
 {
 	public final TileTesslocator block;
 	public final EnumFacing facing;
@@ -52,6 +52,8 @@ public abstract class TesslocatorPart implements ITickable
 
 	@Nullable
 	public abstract <T> T getCapability(Capability<T> capability);
+
+	public abstract void update(TessNet net);
 
 	public int getColor(int layer)
 	{

@@ -4,6 +4,7 @@ import com.latmod.mods.tesslocator.block.BlockTesslocator;
 import com.latmod.mods.tesslocator.block.TileTesslocator;
 import com.latmod.mods.tesslocator.block.part.EnumPartType;
 import com.latmod.mods.tesslocator.block.part.TesslocatorPart;
+import com.latmod.mods.tesslocator.data.TessNet;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.state.IBlockState;
@@ -86,6 +87,11 @@ public class ItemTesslocator extends Item
 				tile.parts[opposite.getIndex()] = part;
 				part.onPlaced(player, stack);
 				tileEntity.markDirty();
+
+				if (!world.isRemote && TessNet.SERVER != null)
+				{
+					TessNet.SERVER.markDirty();
+				}
 			}
 
 			IBlockState state = world.getBlockState(pos);

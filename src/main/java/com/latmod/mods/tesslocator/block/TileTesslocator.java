@@ -133,6 +133,28 @@ public class TileTesslocator extends TileEntity implements ITickable
 	}
 
 	@Override
+	public void invalidate()
+	{
+		super.invalidate();
+
+		if (world != null && !world.isRemote && TessNet.SERVER != null)
+		{
+			TessNet.SERVER.markDirty();
+		}
+	}
+
+	@Override
+	public void setWorld(World world)
+	{
+		super.setWorld(world);
+
+		if (!world.isRemote && TessNet.SERVER != null)
+		{
+			TessNet.SERVER.markDirty();
+		}
+	}
+
+	@Override
 	public void onDataPacket(net.minecraft.network.NetworkManager net, SPacketUpdateTileEntity packet)
 	{
 		readData(packet.getNbtCompound());
@@ -158,7 +180,7 @@ public class TileTesslocator extends TileEntity implements ITickable
 
 				if (!world.isRemote && TessNet.SERVER != null)
 				{
-					part.update();
+					part.update(TessNet.SERVER);
 				}
 			}
 		}

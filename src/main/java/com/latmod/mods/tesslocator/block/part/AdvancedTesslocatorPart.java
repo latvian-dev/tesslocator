@@ -1,6 +1,7 @@
 package com.latmod.mods.tesslocator.block.part;
 
 import com.latmod.mods.tesslocator.block.TileTesslocator;
+import com.latmod.mods.tesslocator.data.TessNet;
 import com.latmod.mods.tesslocator.data.TessNetKey;
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
@@ -116,6 +117,11 @@ public abstract class AdvancedTesslocatorPart extends TesslocatorPart
 				block.updateContainingBlockInfo();
 				block.markDirty();
 				block.rerender();
+
+				if (!block.getWorld().isRemote && TessNet.SERVER != null)
+				{
+					TessNet.SERVER.markDirty();
+				}
 			}
 		}
 	}

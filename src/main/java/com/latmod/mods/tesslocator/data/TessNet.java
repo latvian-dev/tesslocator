@@ -1,12 +1,15 @@
 package com.latmod.mods.tesslocator.data;
 
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
-import net.minecraftforge.common.util.Constants;
+import com.latmod.mods.tesslocator.block.TileTesslocator;
+import com.latmod.mods.tesslocator.block.part.AdvancedTesslocatorPart;
+import com.latmod.mods.tesslocator.block.part.TesslocatorPart;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.world.WorldServer;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 
-import java.util.Collection;
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.function.BiFunction;
+import java.util.Map;
 
 /**
  * @author LatvianModder
@@ -15,70 +18,82 @@ public class TessNet
 {
 	public static TessNet SERVER = null;
 
-	public boolean isDirty = false;
-	private HashMap<TessNetKey, EnergyData> energyData = new HashMap<>();
+	private boolean isDirty = true;
+	private AdvancedTesslocatorPart[] advancedParts = null;
+	private Map<TessNetKey, AdvancedTesslocatorPart[]> keyMap = new HashMap<>();
 
 	public void markDirty()
 	{
 		isDirty = true;
 	}
 
-	private NBTTagList writeToList(Collection<? extends TesslocatorData> values)
+	public void update()
 	{
-		NBTTagList list = new NBTTagList();
-
-		for (TesslocatorData data : values)
+		if (!isDirty)
 		{
-			if (data.shouldSave())
+			return;
+		}
+
+		advancedParts = null;
+		keyMap = null;
+		isDirty = false;
+	}
+
+	public AdvancedTesslocatorPart[] getAll()
+	{
+		if (advancedParts != null)
+		{
+			return advancedParts;
+		}
+
+		ArrayList<AdvancedTesslocatorPart> list = new ArrayList<>();
+
+		for (WorldServer world : FMLCommonHandler.instance().getMinecraftServerInstance().worlds)
+		{
+			for (TileEntity tileEntity : world.loadedTileEntityList)
 			{
-				NBTTagCompound nbt = new NBTTagCompound();
-				data.write(nbt);
-				data.key.write(nbt);
-				list.appendTag(nbt);
+				if (tileEntity instanceof TileTesslocator && !tileEntity.isInvalid())
+				{
+					for (TesslocatorPart part : ((TileTesslocator) tileEntity).parts)
+					{
+						if (part instanceof AdvancedTesslocatorPart)
+						{
+							list.add((AdvancedTesslocatorPart) part);
+						}
+					}
+				}
 			}
 		}
 
-		return list;
+		advancedParts = list.toArray(new AdvancedTesslocatorPart[0]);
+		return advancedParts;
 	}
 
-	private <T extends TesslocatorData> HashMap<TessNetKey, T> readFromList(NBTTagCompound nbt, String key, BiFunction<TessNet, TessNetKey, T> provider)
+	public AdvancedTesslocatorPart[] get(TessNetKey key)
 	{
-		NBTTagList list = nbt.getTagList(key, Constants.NBT.TAG_COMPOUND);
-
-		HashMap<TessNetKey, T> map = new HashMap<>(list.tagCount());
-
-		for (int i = 0; i < list.tagCount(); i++)
+		if (keyMap == null)
 		{
-			NBTTagCompound nbt1 = list.getCompoundTagAt(i);
-			TessNetKey tkey = new TessNetKey(nbt1);
-			T t = provider.apply(this, tkey);
-			t.read(nbt1);
-			map.put(tkey, t);
+			keyMap = new HashMap<>();
 		}
 
-		return map;
-	}
+		AdvancedTesslocatorPart[] array = keyMap.get(key);
 
-	public void write(NBTTagCompound nbt)
-	{
-		nbt.setTag("energy", writeToList(energyData.values()));
-	}
-
-	public void read(NBTTagCompound nbt)
-	{
-		energyData = readFromList(nbt, "energy", EnergyData::new);
-	}
-
-	public EnergyData getEnergyData(TessNetKey key)
-	{
-		EnergyData data = energyData.get(key);
-
-		if (data == null)
+		if (array == null)
 		{
-			data = new EnergyData(this, key);
-			energyData.put(key, data);
+			ArrayList<AdvancedTesslocatorPart> list = new ArrayList<>();
+
+			for (AdvancedTesslocatorPart part : getAll())
+			{
+				if (key.equals(part.getKey()))
+				{
+					list.add(part);
+				}
+			}
+
+			array = list.toArray(new AdvancedTesslocatorPart[0]);
+			keyMap.put(key, array);
 		}
 
-		return data;
+		return array;
 	}
 }

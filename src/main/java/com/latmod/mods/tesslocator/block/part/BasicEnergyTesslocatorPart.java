@@ -1,6 +1,7 @@
 package com.latmod.mods.tesslocator.block.part;
 
 import com.latmod.mods.tesslocator.block.TileTesslocator;
+import com.latmod.mods.tesslocator.data.TessNet;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
@@ -63,7 +64,7 @@ public class BasicEnergyTesslocatorPart extends BasicTesslocatorPart implements 
 	}
 
 	@Override
-	public void update()
+	public void update(TessNet net)
 	{
 		if (energy <= 0)
 		{
@@ -72,7 +73,7 @@ public class BasicEnergyTesslocatorPart extends BasicTesslocatorPart implements 
 
 		if (mode == 0)
 		{
-			TileEntity outEntity = block.getWorld().getTileEntity(block.getPos().offset(facing));
+			TileEntity outEntity = getFacingTile();
 
 			if (outEntity != null)
 			{
@@ -116,13 +117,18 @@ public class BasicEnergyTesslocatorPart extends BasicTesslocatorPart implements 
 
 		int p = Math.min(energy / tempParts, 256);
 
-		if (p > 0)
+		if (p > 0 && energy >= p)
 		{
 			int e = energy;
 
 			for (int i = 0; i < tempParts; i++)
 			{
 				energy -= temp[i].receiveEnergy(p, false);
+
+				if (energy < p)
+				{
+					break;
+				}
 			}
 
 			if (energy != e)
@@ -143,6 +149,11 @@ public class BasicEnergyTesslocatorPart extends BasicTesslocatorPart implements 
 	@Override
 	public int receiveEnergy(int maxReceive, boolean simulate)
 	{
+		if (maxReceive <= 0 || energy >= getMaxEnergyStored())
+		{
+			return 0;
+		}
+
 		int energyReceived = Math.min(getMaxEnergyStored() - energy, Math.min(256, maxReceive));
 
 		if (!simulate)
@@ -157,6 +168,11 @@ public class BasicEnergyTesslocatorPart extends BasicTesslocatorPart implements 
 	@Override
 	public int extractEnergy(int maxExtract, boolean simulate)
 	{
+		if (maxExtract <= 0 || energy <= 0)
+		{
+			return 0;
+		}
+
 		int energyExtracted = Math.min(energy, Math.min(256, maxExtract));
 
 		if (!simulate)

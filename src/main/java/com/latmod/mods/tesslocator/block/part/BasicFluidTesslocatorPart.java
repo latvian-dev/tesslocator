@@ -2,6 +2,7 @@ package com.latmod.mods.tesslocator.block.part;
 
 import com.latmod.mods.tesslocator.TesslocatorConfig;
 import com.latmod.mods.tesslocator.block.TileTesslocator;
+import com.latmod.mods.tesslocator.data.TessNet;
 import com.latmod.mods.tesslocator.gui.ContainerBasicFluidTesslocator;
 import com.latmod.mods.tesslocator.gui.GuiBasicFluidTesslocator;
 import net.minecraft.block.Block;
@@ -184,7 +185,7 @@ public class BasicFluidTesslocatorPart extends BasicTesslocatorPart
 	}
 
 	@Override
-	public void update()
+	public void update(TessNet net)
 	{
 		if (mode == 0)
 		{
