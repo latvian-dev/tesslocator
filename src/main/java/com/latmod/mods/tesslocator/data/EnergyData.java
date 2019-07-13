@@ -37,6 +37,11 @@ public class EnergyData extends TesslocatorData implements IEnergyStorage
 	@Override
 	public int receiveEnergy(int maxReceive, boolean simulate)
 	{
+		if (maxReceive <= 0 || energy >= getMaxEnergyStored())
+		{
+			return 0;
+		}
+
 		int energyReceived = Math.min(getMaxEnergyStored() - energy, maxReceive);
 
 		if (!simulate)
@@ -51,6 +56,11 @@ public class EnergyData extends TesslocatorData implements IEnergyStorage
 	@Override
 	public int extractEnergy(int maxExtract, boolean simulate)
 	{
+		if (maxExtract <= 0 || energy <= 0)
+		{
+			return 0;
+		}
+
 		int energyExtracted = Math.min(energy, maxExtract);
 
 		if (!simulate)
@@ -71,7 +81,7 @@ public class EnergyData extends TesslocatorData implements IEnergyStorage
 	@Override
 	public int getMaxEnergyStored()
 	{
-		return 2048000000;
+		return 4000000;
 	}
 
 	@Override
