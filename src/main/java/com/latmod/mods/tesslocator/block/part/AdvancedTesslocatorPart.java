@@ -14,7 +14,9 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraftforge.oredict.OreDictionary;
 
+import javax.annotation.Nullable;
 import java.util.UUID;
 
 /**
@@ -22,6 +24,63 @@ import java.util.UUID;
  */
 public abstract class AdvancedTesslocatorPart extends TesslocatorPart
 {
+	private static int[] dyes = null;
+
+	@Nullable
+	public static EnumDyeColor getDye(ItemStack stack)
+	{
+		if (stack.getItem() == Items.DYE)
+		{
+			return EnumDyeColor.byDyeDamage(stack.getMetadata());
+		}
+		else if (stack.isEmpty())
+		{
+			return null;
+		}
+
+		if (dyes == null)
+		{
+			String[] names = {
+					"dyeBlack",
+					"dyeRed",
+					"dyeGreen",
+					"dyeBrown",
+					"dyeBlue",
+					"dyePurple",
+					"dyeCyan",
+					"dyeLightGray",
+					"dyeGray",
+					"dyePink",
+					"dyeLime",
+					"dyeYellow",
+					"dyeLightBlue",
+					"dyeMagenta",
+					"dyeOrange",
+					"dyeWhite"
+			};
+
+			dyes = new int[names.length];
+
+			for (int i = 0; i < dyes.length; i++)
+			{
+				dyes[i] = OreDictionary.getOreID(names[i]);
+			}
+		}
+
+		for (int i : OreDictionary.getOreIDs(stack))
+		{
+			for (int index = 0; index < dyes.length; index++)
+			{
+				if (dyes[index] == i)
+				{
+					return EnumDyeColor.byDyeDamage(index);
+				}
+			}
+		}
+
+		return null;
+	}
+
 	public UUID owner = TessNetKey.UUID_00;
 	public boolean isPublic = false;
 	public int colors = 0;
@@ -108,12 +167,12 @@ public abstract class AdvancedTesslocatorPart extends TesslocatorPart
 	{
 		if (hand == EnumHand.MAIN_HAND && !player.getHeldItem(EnumHand.OFF_HAND).isEmpty())
 		{
-			int dyeA = dyeIndex(player.getHeldItem(EnumHand.MAIN_HAND));
-			int dyeB = dyeIndex(player.getHeldItem(EnumHand.OFF_HAND));
+			EnumDyeColor dyeA = getDye(player.getHeldItem(EnumHand.MAIN_HAND));
+			EnumDyeColor dyeB = getDye(player.getHeldItem(EnumHand.OFF_HAND));
 
-			if (dyeA != -1 && dyeB != -1)
+			if (dyeA != null && dyeB != null)
 			{
-				colors = (dyeA | (dyeB << 4)) & 0xFF;
+				colors = (dyeA.getMetadata() | (dyeB.getMetadata() << 4)) & 0xFF;
 				block.updateContainingBlockInfo();
 				block.markDirty();
 				block.rerender();
@@ -124,15 +183,5 @@ public abstract class AdvancedTesslocatorPart extends TesslocatorPart
 				}
 			}
 		}
-	}
-
-	private int dyeIndex(ItemStack stack)
-	{
-		if (stack.getItem() == Items.DYE)
-		{
-			return EnumDyeColor.byDyeDamage(stack.getMetadata()).getMetadata();
-		}
-
-		return -1;
 	}
 }
