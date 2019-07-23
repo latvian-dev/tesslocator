@@ -168,7 +168,7 @@ public class AdvancedEnergyTesslocatorPart extends AdvancedTesslocatorPart imple
 			return 0;
 		}
 
-		int energyReceived = Math.min(getMaxEnergyStored() - energy, Math.min(256, maxReceive));
+		int energyReceived = Math.min(getMaxEnergyStored() - energy, maxReceive);
 
 		if (!simulate)
 		{
@@ -187,7 +187,7 @@ public class AdvancedEnergyTesslocatorPart extends AdvancedTesslocatorPart imple
 			return 0;
 		}
 
-		int energyExtracted = Math.min(energy, Math.min(256, maxExtract));
+		int energyExtracted = Math.min(energy, maxExtract);
 
 		if (!simulate)
 		{
