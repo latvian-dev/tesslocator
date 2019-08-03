@@ -21,6 +21,7 @@ import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
+import net.minecraftforge.fluids.capability.IFluidTankProperties;
 import net.minecraftforge.items.ItemStackHandler;
 
 import javax.annotation.Nullable;
@@ -28,8 +29,9 @@ import javax.annotation.Nullable;
 /**
  * @author LatvianModder
  */
-public class BasicFluidTesslocatorPart extends BasicTesslocatorPart
+public class BasicFluidTesslocatorPart extends BasicTesslocatorPart implements IFluidHandler
 {
+	private static final IFluidTankProperties[] NO_PROPERTIES = new IFluidTankProperties[0];
 	private final BasicFluidTesslocatorPart[] temp = new BasicFluidTesslocatorPart[5];
 	public static boolean ignoreMarkDirty = false;
 
@@ -324,5 +326,31 @@ public class BasicFluidTesslocatorPart extends BasicTesslocatorPart
 	public Object getGuiScreen(Container container)
 	{
 		return new GuiBasicFluidTesslocator((ContainerBasicFluidTesslocator) container);
+	}
+
+	@Override
+	public IFluidTankProperties[] getTankProperties()
+	{
+		return NO_PROPERTIES;
+	}
+
+	@Override
+	public int fill(FluidStack resource, boolean doFill)
+	{
+		return 0;
+	}
+
+	@Nullable
+	@Override
+	public FluidStack drain(FluidStack resource, boolean doDrain)
+	{
+		return null;
+	}
+
+	@Nullable
+	@Override
+	public FluidStack drain(int maxDrain, boolean doDrain)
+	{
+		return null;
 	}
 }
